@@ -376,3 +376,4 @@ made by the signatory clients.
 | ------- | ---------- | --------------- | ------------------------------ |
 | 1.0.0   | 25/10/2026 | Matej Pechoucek | Initial Background Information |
 | 1.0.1   | 25/10/2026 | Matej Pechoucek | Extraction of info from docx   |
+| 1.0.2   | 27/10/2026 | Daniel Harrington | MoSCoW text added to stretch and out of scope requirements |
