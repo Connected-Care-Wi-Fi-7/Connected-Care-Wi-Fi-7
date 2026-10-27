@@ -182,6 +182,8 @@ Should Have Requirements (High Priority):
 
 > Additional requirements if time permits.
 
+Could Have Requirements:
+
 - **FR-12: Multi-Link Operation (MLO) Band Steering:** Evaluate dynamic band
   switching across 5 GHz and 6 GHz to prioritize sensing sensitivity during high
   network traffic.
@@ -202,6 +204,8 @@ Add content here
 ## Out of Scope
 
 > What the project will *not* deliver, to stop scope creep.
+
+Won't Have Requirements:
 
 - **Formal Clinical Diagnostic Validation:** The platform is strictly an
   exploratory engineering prototype and research demonstrator; it does not
