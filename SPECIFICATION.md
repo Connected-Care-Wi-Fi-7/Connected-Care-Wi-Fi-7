@@ -162,7 +162,7 @@ Must Have Requirements (Critical Delivery):
 - **FR-08: Multi-Occupant Trajectory Tracking:** Differentiate and track
   separate spatial centroids when multiple moving individuals occupy the same
   room or hallway.
-- **FR-11: Caregiver Dashboard & Visualizer:** Deliver an intuitive desktop web
+- **FR-11: Caregiver Dashboard & Visualizer:** Deliver an intuitive desktop
   dashboard displaying room occupancy heatmaps, trigger boundaries, and live
   alert telemetry.
 
@@ -274,7 +274,7 @@ Add content here
 
 ## Design and Technical Challenges
 
-> Including web, mobile, wearable, architecture, data analysis, AI/ML, LLMs,
+> Including mobile, architecture, data analysis, AI/ML, LLMs,
 > graphics, VR/AR, security, algorithms, and anything else.
 
 Connected Care with WiFi 7 is engineered as a decoupled, edge-first architecture
