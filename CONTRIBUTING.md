@@ -26,7 +26,7 @@ Never push directly to `main`.
 
 ## Local checks
 
-Run these three commands before you push. CI runs the same checks.
+Run these three commands before you push. CI runs the first two today; `cargo test` joins CI once the Cargo workspace is on `main`.
 
 ```
 cargo fmt --all -- --check

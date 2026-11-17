@@ -1,6 +1,5 @@
-name: Task
+name: Issue
 description: Report a bug, propose a feature, or describe a task, spike or docs change
-title: "[Task]: "
 body:
   - type: markdown
     attributes:
