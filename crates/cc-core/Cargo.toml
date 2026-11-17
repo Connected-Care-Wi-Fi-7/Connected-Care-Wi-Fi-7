@@ -1,0 +1,9 @@
+[package]
+name = "cc-core"
+description = "Shared data contracts for the Connected Care pipeline."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]

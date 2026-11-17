@@ -2149,6 +2149,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "cc-core"
+version = "0.1.0"
+
+[[package]]
 name = "cc-viewer"
 version = "0.1.0"
 dependencies = [
