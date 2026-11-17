@@ -143,9 +143,6 @@ Must Have Requirements (Critical Delivery):
 - **FR-01: Wi-Fi 7 CSI Data Capture Pipeline:** Implement a driver and telemetry
   ingestion service interfacing with Intel Wi-Fi 7 hardware to extract raw
   subcarrier Channel State Information (CSI) and amplitude/phase matrices.
-- **FR-02: 3D RF Spatial Coordinate Mapping:** Generate an interactive,
-  real-time 3D visual occupancy map displaying moving objects and human
-  centroids within the RF propagation sphere.
 - **FR-03: Edge-Based Fall Detection Classifier:** Train and deploy a local
   machine learning classifier to identify acute fall signatures, distinguishing
   rapid vertical descents from controlled reclining or sitting.
@@ -162,21 +159,24 @@ Must Have Requirements (Critical Delivery):
   comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing
   accuracy, latency, packet availability, and concurrent communication
   throughput.
-
-Should Have Requirements (High Priority):
-
 - **FR-08: Multi-Occupant Trajectory Tracking:** Differentiate and track
   separate spatial centroids when multiple moving individuals occupy the same
   room or hallway.
+- **FR-11: Caregiver Dashboard & Visualizer:** Deliver an intuitive desktop web
+  dashboard displaying room occupancy heatmaps, trigger boundaries, and live
+  alert telemetry.
+
+Should Have Requirements (High Priority):
+
+- **FR-02: 3D RF Spatial Coordinate Mapping:** Generate an interactive,
+  real-time 3D visual occupancy map displaying moving objects and human
+  centroids within the RF propagation sphere.
 - **FR-09: False-Alarm Mitigation Filter:** Implement heuristic temporal
   debouncing and secondary state verification to prevent false alarms from
   dropped objects or pets.
 - **FR-10: Complementary Sensor Fusion Hooks:** Provide software ingestion
   interfaces for complementary low-cost sensors (e.g. floor pressure pads, PIR
   motion detectors, radar) to cross-validate Wi-Fi 7 detections.
-- **FR-11: Caregiver Dashboard & Visualizer:** Deliver an intuitive desktop web
-  dashboard displaying room occupancy heatmaps, trigger boundaries, and live
-  alert telemetry.
 
 ## Stretch Requirements
 
@@ -372,8 +372,9 @@ made by the signatory clients.
 
 ## Change Log
 
-| Version | Date       | Author          | Summary of Changes             |
-| ------- | ---------- | --------------- | ------------------------------ |
-| 1.0.0   | 25/10/2026 | Matej Pechoucek | Initial Background Information |
-| 1.0.1   | 25/10/2026 | Matej Pechoucek | Extraction of info from docx   |
+| Version | Date       | Author            | Summary of Changes                                         |
+| ------- | ---------- | ----------------- | ---------------------------------------------------------- |
+| 1.0.0   | 25/10/2026 | Matej Pechoucek   | Initial Background Information                             |
+| 1.0.1   | 25/10/2026 | Matej Pechoucek   | Extraction of info from docx                               |
 | 1.0.2   | 27/10/2026 | Daniel Harrington | MoSCoW text added to stretch and out of scope requirements |
+| 1.0.3   | 17/11/2026 | Matej Pechoucek   | Moved requirements to different necessity levels           |
