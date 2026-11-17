@@ -1,0 +1,93 @@
+name: Task
+description: Report a bug, propose a feature, or describe a task, spike or docs change
+title: "[Task]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        After you submit, apply the matching `type:`, `area:` and `priority:` labels and set a milestone. GitHub issue forms cannot set labels from dropdown answers, so this step is manual.
+
+        See CONTRIBUTING.md for what each label and milestone means.
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Bug
+        - Feature
+        - Task
+        - Spike
+        - Docs
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Platform
+        - Sensing
+        - DSP
+        - Mapping
+        - Dashboard
+        - Alerts
+        - Project
+    validations:
+      required: true
+  - type: input
+    id: requirement
+    attributes:
+      label: Requirement
+      description: The requirement from SPECIFICATION.md this work supports, for example FR-04. Write "none" if there is no matching requirement.
+      placeholder: FR-04
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Must
+        - Should
+        - Could
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What needs to happen, in a few sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why this is needed, links to related issues, ADRs or documents.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: A checklist that tells the reviewer when this issue is finished.
+      placeholder: |
+        - [ ] First observable outcome
+        - [ ] Second observable outcome
+        - [ ] Tests added or updated
+    validations:
+      required: true
+  - type: dropdown
+    id: hardware
+    attributes:
+      label: Hardware dependency
+      options:
+        - None
+        - Simulator only
+        - Needs hardware
+    validations:
+      required: true
+  - type: textarea
+    id: bug-details
+    attributes:
+      label: Bug details
+      description: Bugs only. Include steps to reproduce, expected behaviour, actual behaviour and environment (operating system, Rust version, commit).
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Anything related that this issue deliberately does not cover.
