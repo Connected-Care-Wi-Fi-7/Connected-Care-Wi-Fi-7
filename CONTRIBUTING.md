@@ -1,10 +1,10 @@
 # Contributing
 
-This guide explains how the team works on Connected Care Wi-Fi 7. Read it before your first pull request. For what the system is, see `SPECIFICATION.md`. For how the code is meant to be organised, see `docs/ARCHITECTURE.md`. For who owns what, see `docs/ROLES.md`.
+This guide explains how the team works on Connected Care Wi-Fi 7. Read it before your first pull request. For what the system is, see `SPECIFICATION.md`. For how the code is meant to be organised, see `docs/ARCHITECTURE.md`. For who leads which area, see `docs/ROLES.md`.
 
 ## Workflow
 
-1. **Issue first.** Every change starts with a GitHub issue created from the issue form. If the work is not described in an issue, create one before you write code. Apply the `type:`, `area:` and `priority:` labels and a milestone.
+1. **Issue first.** Every change starts with a GitHub issue created from the issue form. Roles are loose (see `docs/ROLES.md`): take any open issue in any area by assigning yourself. If the work is not described in an issue, create one before you write code. Apply the `type:`, `area:` and `priority:` labels and a milestone.
 2. **Branch.** Create a branch from an up-to-date `main`, named `type/short-name`. The type is one of `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`. Use lower-case words separated by hyphens. Examples:
    - `feat/hampel-filter`
    - `fix/voxel-grid-off-by-one`
@@ -54,7 +54,7 @@ If an acceptance criterion can only be checked on real hardware, say so in the i
 - Only `apps/viewer` depends on Bevy. Every crate under `crates/` is headless and unit-testable.
 - Crates communicate only through types defined in `cc-core`. A crate must not reach into another crate's internals.
 - Hardware sits behind a trait defined in `cc-core` and behind a cargo feature. The rest of the code never mentions a specific device.
-- A change to a `cc-core` contract (data types or traits) needs an ADR and a review from the Platform & Integration role. See "Decisions" below.
+- A change to a `cc-core` contract (data types or traits) needs an ADR and a review from the Platform & Integration lead. See "Decisions" below.
 
 ## Rust rules
 
@@ -89,7 +89,7 @@ Every issue carries one label from each of these groups. The form cannot set the
 | Prefix | Meaning | Values |
 | --- | --- | --- |
 | `type:` | What kind of work it is | `bug`, `feature`, `task`, `spike`, `docs` |
-| `area:` | Which part of the system, matching a role in `docs/ROLES.md` | `platform`, `sensing`, `dsp`, `mapping`, `dashboard`, `alerts`, `project` |
+| `area:` | Which part of the system, matching an area in `docs/ROLES.md` | `platform`, `sensing`, `dsp`, `mapping`, `dashboard`, `alerts`, `project` |
 | `priority:` | How important it is | `must`, `should`, `could` |
 
 Two further labels have no prefix:

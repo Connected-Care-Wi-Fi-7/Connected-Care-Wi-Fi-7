@@ -64,7 +64,7 @@ Traits are resolved at compile time. There is no dynamic library loading. Which 
 - Crates communicate only through types and traits in `cc-core`. For example, `cc-mapping` never imports `cc-dsp`. Both depend on `cc-core`, and `cc-pipeline` connects them.
 - Hardware appears only behind a trait and a cargo feature.
 
-`cc-core` is therefore the most sensitive crate. A change to its contracts needs an ADR and a review from the Platform & Integration role.
+`cc-core` is therefore the most sensitive crate. A change to its contracts needs an ADR and a review from the Platform & Integration lead.
 
 ## Fake at every seam (walking skeleton)
 

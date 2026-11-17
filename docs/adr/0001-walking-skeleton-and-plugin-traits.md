@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-The project turns Wi-Fi 7 CSI into occupancy tracking, zone triggers and alerts, in Rust, with no cloud dependency. The specification describes five layers. The team has five members, each owning one area.
+The project turns Wi-Fi 7 CSI into occupancy tracking, zone triggers and alerts, in Rust, with no cloud dependency. The specification describes five layers. The team has five members. Each leads one area, and everyone works across areas.
 
 There is no hardware yet. The planned hardware is an Intel BE200 adapter, and we do not know when it will arrive. The fall-detection model is built by an external collaborator, so the team provides only the integration point for it. The main delivery deadline is 12 March 2027.
 
@@ -35,11 +35,11 @@ The target layout is described in `docs/ARCHITECTURE.md`.
 - The Bevy app can demonstrate a scripted fall end to end before any real algorithm exists, at the end of milestone M1.
 - Integration risk is found early, because the stages are connected from the start.
 - Adding the Intel BE200 source later means writing one new crate and one cargo feature. If the BE200 tooling emits data that does not fit `CsiFrame`, the `cc-core` contract must change. A spike early in the project checks this.
-- `cc-core` becomes a shared dependency of everything, so changes to it need an ADR and review from the Platform & Integration role. Until it is stable, other roles may be blocked on it.
+- `cc-core` becomes a shared dependency of everything, so changes to it need an ADR and review from the Platform & Integration lead. Until it is stable, work in other areas may be blocked on it.
 - Results measured on the simulator must be labelled as simulator-verified until hardware is available.
 
 ## Alternatives considered
 
-- **Build layer by layer in pipeline order.** Rejected. The dashboard and alerts owners would have nothing to build on for weeks, and integration problems would appear late, close to the deadline.
+- **Build layer by layer in pipeline order.** Rejected. Anyone working on the dashboard and alerts would have nothing to build on for weeks, and integration problems would appear late, close to the deadline.
 - **Wait for hardware before building.** Rejected. Nothing would be delivered if the hardware is late or never arrives.
 - **Load drivers as dynamic libraries at run time.** Rejected. It adds complexity and unsafe boundaries that the project does not need. Compile-time traits with cargo features are simpler and are checked by the compiler.
