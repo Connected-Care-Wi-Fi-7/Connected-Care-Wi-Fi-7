@@ -11,17 +11,15 @@ Being the lead of an area means you:
 
 Being the lead does not mean you do all the work in the area, or only work in that area. Issues are not assigned by area. Anyone takes any open issue by assigning themselves, and people are expected to work outside their own area regularly. If the lead is busy or away, any other team member can review.
 
-The Team Lead role from `SPECIFICATION.md` is held alongside one of these. It is not a sixth role.
-
-Names are not assigned yet. The "Lead" column stays `TBD` until the team decides.
+The Team Lead role from `SPECIFICATION.md` is held by Daniel Harrington alongside leading Sensing & Simulation. It is not a sixth role.
 
 | Area | Lead | Area label | Covers |
 | --- | --- | --- | --- |
-| 1. Platform & Integration | TBD | `area:platform` | `cc-core`, `cc-pipeline`, CI, classifier seam |
-| 2. Sensing & Simulation | TBD | `area:sensing` | `cc-sim`, driver stub, auxiliary sensor hooks |
-| 3. Signal Processing | TBD | `area:dsp` | `cc-dsp` |
-| 4. Spatial Mapping & Tracking | TBD | `area:mapping` | `cc-mapping` |
-| 5. Dashboard & Alerts | TBD | `area:dashboard`, `area:alerts` | `apps/viewer`, `cc-alerts` |
+| 1. Platform & Integration | Matej Pechoucek | `area:platform` | `cc-core`, `cc-pipeline`, CI, classifier seam |
+| 2. Sensing & Simulation | Daniel Harrington (Team Lead) | `area:sensing` | `cc-sim`, driver stub, auxiliary sensor hooks |
+| 3. Signal Processing | Ben Dalton | `area:dsp` | `cc-dsp` |
+| 4. Spatial Mapping & Tracking | Daniel Wheeler | `area:mapping` | `cc-mapping` |
+| 5. Dashboard & Alerts | Magizh Umashankar | `area:dashboard`, `area:alerts` | `apps/viewer`, `cc-alerts` |
 
 Issues with `area:project` (spec corrections, licence, ethics, evaluation report) are routed by the Team Lead.
 
