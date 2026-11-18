@@ -13,15 +13,24 @@ Being the lead does not mean you do all the work in the area, or only work in th
 
 The Team Lead role from `SPECIFICATION.md` is held by Daniel Harrington alongside leading Sensing & Simulation. It is not a sixth role.
 
-| Area | Lead | Area label | Covers |
-| --- | --- | --- | --- |
-| 1. Platform & Integration | Matej Pechoucek | `area:platform` | `cc-core`, `cc-pipeline`, CI, classifier seam |
-| 2. Sensing & Simulation | Daniel Harrington (Team Lead) | `area:sensing` | `cc-sim`, driver stub, auxiliary sensor hooks |
-| 3. Signal Processing | Ben Dalton | `area:dsp` | `cc-dsp` |
-| 4. Spatial Mapping & Tracking | Daniel Wheeler | `area:mapping` | `cc-mapping` |
-| 5. Dashboard & Alerts | Magizh Umashankar | `area:dashboard`, `area:alerts` | `apps/viewer`, `cc-alerts` |
+| Area | Lead | GitHub | Area label | Covers |
+| --- | --- | --- | --- | --- |
+| 1. Platform & Integration | Matej Pechoucek | `MatejPechoucek` | `area:platform` | `cc-core`, `cc-pipeline`, CI, classifier seam |
+| 2. Sensing & Simulation | Daniel Harrington (Team Lead) | `danielharrington06` | `area:sensing` | `cc-sim`, driver stub, auxiliary sensor hooks |
+| 3. Signal Processing | Ben Dalton | `bendalton409` | `area:dsp` | `cc-dsp` |
+| 4. Spatial Mapping & Tracking | Daniel Wheeler | `Dwheeler4` | `area:mapping` | `cc-mapping` |
+| 5. Dashboard & Alerts | Magizh Umashankar | `Magizh-Shankar` | `area:dashboard`, `area:alerts` | `apps/viewer`, `cc-alerts` |
 
 Issues with `area:project` (spec corrections, licence, ethics, evaluation report) are routed by the Team Lead.
+
+### How review routing works
+
+The lead of an issue's area is its default reviewer. This is automated:
+
+- **Issues.** The issue form's Type, Area and Priority answers become `type:`, `area:` and `priority:` labels. The project board's **Lead reviewer** field is then set to the lead of the issue's `area:` label. Sub-issues are skipped; their parent issue carries the reviewer.
+- **Pull requests.** The PR gets the `area:` label of the issue it closes (`Closes #N`), and a review is requested from that area's lead. If the author is the lead, the Team Lead is requested instead. `.github/CODEOWNERS` also requests the lead when files in their area change.
+
+The area to lead mapping lives in `.github/area-leads.json`. When a lead changes, update that file, `.github/CODEOWNERS`, the table above, and the options of the board's "Lead reviewer" field. A requested review is a default, not a requirement: any team member may approve.
 
 The crates listed here are the planned layout. See `docs/ARCHITECTURE.md`. The "Team goal for M1" lists below are goals for the whole team in that area, not a personal task list for the lead.
 

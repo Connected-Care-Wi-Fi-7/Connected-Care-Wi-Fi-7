@@ -4,7 +4,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        After you submit, apply the matching `type:`, `area:` and `priority:` labels and set a milestone. GitHub issue forms cannot set labels from dropdown answers, so this step is manual.
+        After you submit, the `type:`, `area:` and `priority:` labels are applied from your answers automatically, and the area lead is set as "Lead reviewer" on the project board. Check the labels and set a milestone.
 
         See CONTRIBUTING.md for what each label and milestone means.
   - type: dropdown
