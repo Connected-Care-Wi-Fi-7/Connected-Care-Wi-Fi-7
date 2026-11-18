@@ -66,7 +66,7 @@ If an acceptance criterion can only be checked on real hardware, say so in the i
 
 ## Zero-cloud rules
 
-The project requires all processing to stay on the local machine (FR-05).
+The project requires all processing to stay on the local machine (FR-04, local edge processing).
 
 - Do not write outbound network code. No HTTP clients, no telemetry, no update checks.
 - Any listener you add must bind to `127.0.0.1` only, never `0.0.0.0`.
@@ -75,7 +75,7 @@ The project requires all processing to stay on the local machine (FR-05).
 
 ## Privacy and data rules
 
-The project processes zero personally identifiable information (PII) (FR-06).
+The project processes zero personally identifiable information (PII) (FR-05, privacy-first synthetic and controlled testing).
 
 - Do not commit real captures, recordings of real people, or anything that could identify a person. This includes names, email addresses, room numbers and photographs.
 - Do not commit large data files. Datasets stay outside the repository, and the repository records where they come from.

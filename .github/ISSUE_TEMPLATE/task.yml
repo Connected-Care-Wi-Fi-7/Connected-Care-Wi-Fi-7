@@ -37,8 +37,8 @@ body:
     id: requirement
     attributes:
       label: Requirement
-      description: The requirement from SPECIFICATION.md this work supports, for example FR-04. Write "none" if there is no matching requirement.
-      placeholder: FR-04
+      description: The requirement from SPECIFICATION.md this work supports, with its number and name, for example "FR-03 (spatial triggers)". Write "none" if there is no matching requirement.
+      placeholder: FR-03 (spatial triggers)
   - type: dropdown
     id: priority
     attributes:

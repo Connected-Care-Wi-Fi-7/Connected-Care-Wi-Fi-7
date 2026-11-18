@@ -4,10 +4,10 @@
 
 | Field | Value |
 | ------- | ------- |
-| Version number and date of this document | v1.0.0 25/10/2026 |
+| Version number and date of this document | v1.0.5 18/11/2026 |
 | Team No. | 12 |
 | Working Project Title | Connected-Care-WiFi-7 |
-| Project GitHub Repo URL | <https://github.com/danielharrington06/Connected-Care-WiFi-7> |
+| Project GitHub Repo URL | <https://github.com/Connected-Care-Wi-Fi-7/Connected-Care-Wi-Fi-7> |
 | Academic Supervisor Name | Graham Roberts |
 | IXN Contact Lead Name | Dean Mohamedally |
 | TA Name | Doga Yilmaz |
@@ -16,11 +16,11 @@
 
 | Name | Email | Role |
 | ------ | ------- | ------ |
-| Daniel Harrington | <daniel.harrington.25@ucl.ac.uk> | Team Lead |
-| Matej Pechoucek | <matej.pechoucek.25@ucl.ac.uk> | TBD |
-| Magizh Umashankar | <magizh.umashankar.25@ucl.ac.uk> | TBD |
-| Daniel Wheeler | <daniel.wheeler.25@ucl.ac.uk> | TBD |
-| Ben Dalton | <benjamin.dalton.25@ucl.ac.uk> | TBD |
+| Daniel Harrington | <daniel.harrington.25@ucl.ac.uk> | Team Lead; Sensing & Simulation lead |
+| Matej Pechoucek | <matej.pechoucek.25@ucl.ac.uk> | Platform & Integration lead |
+| Magizh Umashankar | <magizh.umashankar.25@ucl.ac.uk> | Dashboard & Alerts lead |
+| Daniel Wheeler | <daniel.wheeler.25@ucl.ac.uk> | Spatial Mapping & Tracking lead |
+| Ben Dalton | <benjamin.dalton.25@ucl.ac.uk> | Signal Processing lead |
 | Mariha Subhan | <mariha.subhan.24@ucl.ac.uk> | Final Year Student Collaborator |
 
 ## Partner Organisation
@@ -121,14 +121,14 @@ without collecting identifiable imagery or demanding wearable compliance.
   extraction driver; benchmark baseline packet availability and noise floors.
 - **Phase 2: Signal Filtering & 3D Mapping Core (Nov – Dec 2026), Weeks 5 – 8:**
   Build phase unwrapping and wavelet filters; reconstruct 3D occupancy voxel
-  grid; train baseline fall classifier on synthetic and open datasets.
+  grid; integrate the fall-classifier interface with a stub classifier.
 - **Phase 3: Trigger Automation & Feasibility Benchmarking (Jan – Feb 2027),
   Weeks 9 – 12:** Implement user-defined spatial alert triggers; test
   false-positive rejection; evaluate network throughput trade-offs; author
   technical evaluation.
 - **Hard Deadline 1: Software Delivery, Friday, 12 March 2027:** Full Software
   Code Delivery: Feature-frozen CSI pipeline, 3D visualizer, fall detection
-  model, alert manager, test suites, and documentation.
+  model integration, alert manager, test suites, and documentation.
 - **Hard Deadline 2: Website & Video Delivery, Tuesday, 16 March 2027:** Public
   IXN Website & Video: Complete project website, technical architecture
   walkthrough, demonstrator showcase video, and research report.
@@ -143,9 +143,11 @@ Must Have Requirements (Critical Delivery):
 - **FR-01: Wi-Fi 7 CSI Data Capture Pipeline:** Implement a driver and telemetry
   ingestion service interfacing with Intel Wi-Fi 7 hardware to extract raw
   subcarrier Channel State Information (CSI) and amplitude/phase matrices.
-- **FR-02: Edge-Based Fall Detection Classifier:** Train and deploy a local
-  machine learning classifier to identify acute fall signatures, distinguishing
-  rapid vertical descents from controlled reclining or sitting.
+- **FR-02: Edge-Based Fall Detection Classifier:** Integrate a local machine
+  learning classifier that identifies acute fall signatures, distinguishing
+  rapid vertical descents from controlled reclining or sitting. The model is
+  developed by an external collaborator; the team provides the integration
+  interface and a stub threshold classifier to use until the model is ready.
 - **FR-03: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set
   recorded movements or designated 3D coordinate volumes as custom event
   triggers that dispatch alerts upon detection.
@@ -162,9 +164,9 @@ Must Have Requirements (Critical Delivery):
 - **FR-07: Multi-Occupant Trajectory Tracking:** Differentiate and track
   separate spatial centroids when multiple moving individuals occupy the same
   room or hallway.
-- **FR-8: Caregiver Dashboard:** Deliver an intuitive desktop
-  dashboard displaying room occupancy heatmaps, trigger boundaries, and live
-  alert telemetry.
+- **FR-8: Caregiver Dashboard:** Deliver an intuitive dashboard inside the
+  native desktop application displaying room occupancy heatmaps, trigger
+  boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
 - **FR-9: 2D RF Spatial Coordinate Mapping:** Implement a 2D 
   occupancy map which displays moving objects and humans within a 2D space
   and height resembled in sheets of 2D planes.
@@ -301,7 +303,7 @@ comprising five core layers:
 5. **Spatial Trigger Configuration & Alert Hub:** Administrative dashboard for
    care staff to define interactive trigger zones (e.g. bed boundary, bathroom
    entrance) and dispatch automated network pulses, nurse-station alerts, or
-   MQTT/Webex event payloads.
+   MQTT event payloads to a broker on the local network.
 
 ## Knowledge/Skills Required
 
@@ -317,7 +319,9 @@ Add content here
 > Anthropic, etc.), will it be funded by the project partner?
 
 - **Wireless Standard & Hardware:** IEEE 802.11be (Wi-Fi 7), Intel BE200
-  PCIe/M.2 NICs.
+  PCIe/M.2 NICs. The hardware is not yet available to the team, so the software
+  is built and tested against a simulator first. Hardware drivers plug in later
+  behind defined interfaces without changes to the rest of the system.
 
 ## Compute and GPU Resources
 
@@ -382,3 +386,4 @@ made by the signatory clients.
 | 1.0.2   | 27/10/2026 | Daniel Harrington | MoSCoW text added to stretch and out of scope requirements      |
 | 1.0.3   | 17/11/2026 | Matej Pechoucek   | Moved requirements to different necessity levels                |
 | 1.0.4   | 18/11/2026 | Matej Pechoucek   | Re-numbered requirements and added 2D visualization requirement |
+| 1.0.5   | 18/11/2026 | Matej Pechoucek   | Fixed repo URL, filled team roles, clarified FR-02 and FR-8, removed cloud (Webex) alert option, noted hardware availability |
