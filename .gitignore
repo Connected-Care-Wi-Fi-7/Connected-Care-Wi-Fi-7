@@ -1,0 +1,45 @@
+# --- Rust / Cargo ---
+/target/
+**/*.rs.bk
+# Debug symbols on Windows
+*.pdb
+# Cargo.lock is committed on purpose: this workspace builds an application.
+
+# --- Bevy ---
+# Output of Bevy's asset processor
+/imported_assets/
+
+# --- Profiling and coverage ---
+*.profraw
+*.profdata
+perf.data*
+flamegraph*.svg
+/coverage/
+lcov.info
+tarpaulin-report.*
+
+# --- Local data (zero-cloud / privacy: never commit captures) ---
+# Raw CSI captures and recordings stay on the machine that made them.
+/data/
+*.pcap
+*.pcapng
+
+# --- Secrets and local environment ---
+.env
+.env.*
+!.env.example
+
+# --- Editors and IDEs ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.fleet/
+.zed/
+
+# --- OS files ---
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
