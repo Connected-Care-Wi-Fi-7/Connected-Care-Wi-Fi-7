@@ -143,38 +143,41 @@ Must Have Requirements (Critical Delivery):
 - **FR-01: Wi-Fi 7 CSI Data Capture Pipeline:** Implement a driver and telemetry
   ingestion service interfacing with Intel Wi-Fi 7 hardware to extract raw
   subcarrier Channel State Information (CSI) and amplitude/phase matrices.
-- **FR-03: Edge-Based Fall Detection Classifier:** Train and deploy a local
+- **FR-02: Edge-Based Fall Detection Classifier:** Train and deploy a local
   machine learning classifier to identify acute fall signatures, distinguishing
   rapid vertical descents from controlled reclining or sitting.
-- **FR-04: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set
+- **FR-03: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set
   recorded movements or designated 3D coordinate volumes as custom event
   triggers that dispatch alerts upon detection.
-- **FR-05: Local Edge Processing (Zero Cloud Dependency):** Execute all signal
+- **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal
   processing, 3D mapping, and inference locally on an on-premise edge gateway
   without transmitting raw RF or sensor data off-site.
-- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model
+- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model
   training and validation using public anonymized datasets, synthetic RF
   perturbations, or controlled laboratory simulations with zero PII.
-- **FR-07: Feasibility & Performance Evaluation Report:** Deliver a
+- **FR-06: Feasibility & Performance Evaluation Report:** Deliver a
   comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing
   accuracy, latency, packet availability, and concurrent communication
   throughput.
-- **FR-08: Multi-Occupant Trajectory Tracking:** Differentiate and track
+- **FR-07: Multi-Occupant Trajectory Tracking:** Differentiate and track
   separate spatial centroids when multiple moving individuals occupy the same
   room or hallway.
-- **FR-11: Caregiver Dashboard & Visualizer:** Deliver an intuitive desktop
+- **FR-8: Caregiver Dashboard:** Deliver an intuitive desktop
   dashboard displaying room occupancy heatmaps, trigger boundaries, and live
   alert telemetry.
+- **FR-9: 2D RF Spatial Coordinate Mapping:** Implement a 2D 
+  occupancy map which displays moving objects and humans within a 2D space
+  and height resembled in sheets of 2D planes.
 
 Should Have Requirements (High Priority):
 
-- **FR-02: 3D RF Spatial Coordinate Mapping:** Generate an interactive,
+- **FR-10: 3D RF Spatial Coordinate Mapping:** Generate an interactive,
   real-time 3D visual occupancy map displaying moving objects and human
   centroids within the RF propagation sphere.
-- **FR-09: False-Alarm Mitigation Filter:** Implement heuristic temporal
+- **FR-11: False-Alarm Mitigation Filter:** Implement heuristic temporal
   debouncing and secondary state verification to prevent false alarms from
   dropped objects or pets.
-- **FR-10: Complementary Sensor Fusion Hooks:** Provide software ingestion
+- **FR-12: Complementary Sensor Fusion Hooks:** Provide software ingestion
   interfaces for complementary low-cost sensors (e.g. floor pressure pads, PIR
   motion detectors, radar) to cross-validate Wi-Fi 7 detections.
 
@@ -184,13 +187,13 @@ Should Have Requirements (High Priority):
 
 Could Have Requirements:
 
-- **FR-12: Multi-Link Operation (MLO) Band Steering:** Evaluate dynamic band
+- **FR-13: Multi-Link Operation (MLO) Band Steering:** Evaluate dynamic band
   switching across 5 GHz and 6 GHz to prioritize sensing sensitivity during high
   network traffic.
-- **FR-13: Subtle Respiration & Micro-Movement Sensing:** Experiment with
+- **FR-14: Subtle Respiration & Micro-Movement Sensing:** Experiment with
   subcarrier phase variance to estimate stationary chest movements and nocturnal
   resting patterns when occupants are in bed.
-- **FR-14: Smart Facility IoT Actuation:** Dispatch automated IoT triggers to
+- **FR-15: Smart Facility IoT Actuation:** Dispatch automated IoT triggers to
   illuminate pathway lighting or unlock automated room doors when an occupant
   stands up at night.
 
@@ -257,10 +260,10 @@ Add content here
 - **Network & Sensing Performance Evaluation:** Benchmark detection latency,
   packet availability, classification accuracy, and network QoS to quantify the
   trade-offs of concurrent sensing and data communication over Wi-Fi 7.
-- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model
+- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model
   training and validation using public anonymized datasets, synthetic RF
   perturbations, or controlled laboratory simulations with zero PII.
-- **FR-07: Feasibility & Performance Evaluation Report:** Deliver a
+- **FR-06: Feasibility & Performance Evaluation Report:** Deliver a
   comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing
   accuracy, latency, packet availability, and concurrent communication
   throughput.
@@ -321,7 +324,7 @@ Add content here
 > Specific resources needed to support AI use or development. Will they be
 > available?
 
-- **FR-05: Local Edge Processing (Zero Cloud Dependency):** Execute all signal
+- **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal
   processing, 3D mapping, and inference locally on an on-premise edge gateway
   without transmitting raw RF or sensor data off-site.
 
@@ -332,7 +335,7 @@ Add content here
 > and does it have any special storage requirements (e.g., due to size or
 > restricted accessibility)?
 
-- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model
+- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model
   training and validation using public anonymized datasets, synthetic RF
   perturbations, or controlled laboratory simulations with zero PII.
 
@@ -372,9 +375,10 @@ made by the signatory clients.
 
 ## Change Log
 
-| Version | Date       | Author            | Summary of Changes                                         |
-| ------- | ---------- | ----------------- | ---------------------------------------------------------- |
-| 1.0.0   | 25/10/2026 | Matej Pechoucek   | Initial Background Information                             |
-| 1.0.1   | 25/10/2026 | Matej Pechoucek   | Extraction of info from docx                               |
-| 1.0.2   | 27/10/2026 | Daniel Harrington | MoSCoW text added to stretch and out of scope requirements |
-| 1.0.3   | 17/11/2026 | Matej Pechoucek   | Moved requirements to different necessity levels           |
+| Version | Date       | Author            | Summary of Changes                                              |
+| ------- | ---------- | ----------------- | --------------------------------------------------------------- |
+| 1.0.0   | 25/10/2026 | Matej Pechoucek   | Initial Background Information                                  |
+| 1.0.1   | 25/10/2026 | Matej Pechoucek   | Extraction of info from docx                                    |
+| 1.0.2   | 27/10/2026 | Daniel Harrington | MoSCoW text added to stretch and out of scope requirements      |
+| 1.0.3   | 17/11/2026 | Matej Pechoucek   | Moved requirements to different necessity levels                |
+| 1.0.4   | 18/11/2026 | Matej Pechoucek   | Re-numbered requirements and added 2D visualization requirement |
