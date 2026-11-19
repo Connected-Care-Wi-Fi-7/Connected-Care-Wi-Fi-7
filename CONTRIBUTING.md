@@ -4,7 +4,7 @@ This guide explains how the team works on Connected Care Wi-Fi 7. Read it before
 
 ## Workflow
 
-1. **Issue first.** Every change starts with a GitHub issue created from the issue form. Roles are loose (see `docs/ROLES.md`): take any open issue in any area by assigning yourself. If the work is not described in an issue, create one before you write code. Apply the `type:`, `area:` and `priority:` labels and a milestone.
+1. **Issue first.** Every change starts with a GitHub issue created from the issue form. Roles are loose (see `docs/ROLES.md`): take any open issue in any area by assigning yourself. If the work is not described in an issue, create one before you write code. The `type:`, `area:` and `priority:` labels are applied from the form answers automatically; check them and set a milestone.
 2. **Branch.** Create a branch from an up-to-date `main`, named `type/short-name`. The type is one of `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`. Use lower-case words separated by hyphens. Examples:
    - `feat/hampel-filter`
    - `fix/voxel-grid-off-by-one`
@@ -16,7 +16,7 @@ This guide explains how the team works on Connected Care Wi-Fi 7. Read it before
    - `docs: describe the replay file format`
    - `ci: pin the Rust toolchain`
 4. **Open a pull request** against `main`. Fill in the template and put `Closes #<issue number>` under "Linked issue" so the issue closes when the PR merges.
-5. **Review.** One approving review from another team member is required. Reviewers check the Definition of Done below.
+5. **Review.** One approving review from another team member is required. The lead of the linked issue's area is requested automatically (see "How review routing works" in `docs/ROLES.md`), but anyone may approve. Reviewers check the Definition of Done below.
 6. **CI must be green** before merging.
 7. **Squash merge.** The squashed commit message must also follow Conventional Commits.
 
@@ -66,7 +66,7 @@ If an acceptance criterion can only be checked on real hardware, say so in the i
 
 ## Zero-cloud rules
 
-The project requires all processing to stay on the local machine (FR-05).
+The project requires all processing to stay on the local machine (FR-04, local edge processing).
 
 - Do not write outbound network code. No HTTP clients, no telemetry, no update checks.
 - Any listener you add must bind to `127.0.0.1` only, never `0.0.0.0`.
@@ -75,7 +75,7 @@ The project requires all processing to stay on the local machine (FR-05).
 
 ## Privacy and data rules
 
-The project processes zero personally identifiable information (PII) (FR-06).
+The project processes zero personally identifiable information (PII) (FR-05, privacy-first synthetic and controlled testing).
 
 - Do not commit real captures, recordings of real people, or anything that could identify a person. This includes names, email addresses, room numbers and photographs.
 - Do not commit large data files. Datasets stay outside the repository, and the repository records where they come from.
@@ -84,7 +84,7 @@ The project processes zero personally identifiable information (PII) (FR-06).
 
 ## Labels
 
-Every issue carries one label from each of these groups. The form cannot set them for you, so apply them by hand.
+Every issue carries one label from each of these groups. A workflow (`.github/workflows/issue-triage.yml`) applies them from the issue form answers when the issue is opened. Labels you set by hand are never overwritten.
 
 | Prefix | Meaning | Values |
 | --- | --- | --- |

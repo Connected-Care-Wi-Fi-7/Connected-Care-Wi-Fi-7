@@ -1,0 +1,148 @@
+name: Issue triage
+
+# Turns the issue form answers into labels, and records the area lead as the
+# issue's "Lead reviewer" on the project board. The area -> lead mapping lives in
+# .github/area-leads.json.
+
+on:
+  issues:
+    types: [opened, edited, labeled, unlabeled]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: issue-triage-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    env:
+      HAS_PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/area-leads.json
+          sparse-checkout-cone-mode: false
+
+      # Labels set with GITHUB_TOKEN do not trigger another workflow run,
+      # so this step cannot loop.
+      - name: Apply labels from issue form
+        if: github.event.action == 'opened' || github.event.action == 'edited'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const answer = (heading) => {
+              const m = body.match(new RegExp(`^### ${heading}\\s*\\n+([^\\n]+)`, 'm'));
+              if (!m) return null;
+              const value = m[1].trim();
+              return value === '_No response_' ? null : value.toLowerCase();
+            };
+
+            const existing = context.payload.issue.labels.map((l) => l.name);
+            const hasPrefix = (p) => existing.some((n) => n.startsWith(p));
+            const toAdd = [];
+
+            // Never overwrite a label someone already set by hand.
+            for (const [heading, prefix] of [['Type', 'type:'], ['Area', 'area:'], ['Priority', 'priority:']]) {
+              const value = answer(heading);
+              if (value && !hasPrefix(prefix)) toAdd.push(prefix + value);
+            }
+            if (answer('Hardware dependency') === 'needs hardware' && !existing.includes('hw:needed')) {
+              toAdd.push('hw:needed');
+            }
+
+            if (toAdd.length === 0) return;
+            core.info(`Adding labels: ${toAdd.join(', ')}`);
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: context.issue.number,
+              labels: toAdd,
+            });
+
+      # Writing to an organisation project needs a token with project access;
+      # GITHUB_TOKEN cannot. Without the PROJECT_TOKEN secret this step is skipped.
+      - name: Set Lead reviewer on the project board
+        if: env.HAS_PROJECT_TOKEN == 'true'
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const { areas } = JSON.parse(fs.readFileSync('.github/area-leads.json', 'utf8'));
+            const PROJECT_OWNER = context.repo.owner;
+            const PROJECT_NUMBER = 2;
+            const FIELD_NAME = 'Lead reviewer';
+
+            const { repository } = await github.graphql(
+              `query($owner: String!, $repo: String!, $number: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  issue(number: $number) {
+                    id
+                    parent { number }
+                    labels(first: 50) { nodes { name } }
+                  }
+                }
+              }`,
+              { owner: context.repo.owner, repo: context.repo.repo, number: context.issue.number },
+            );
+            const issue = repository.issue;
+
+            // Only top-level issues get a reviewer; sub-issues follow their parent.
+            if (issue.parent) {
+              core.info(`Sub-issue of #${issue.parent.number}; skipping.`);
+              return;
+            }
+
+            const areaLabels = issue.labels.nodes.map((l) => l.name).filter((n) => n.startsWith('area:'));
+            if (areaLabels.length !== 1) {
+              core.info(`Expected exactly one area: label, found ${areaLabels.length}; skipping.`);
+              return;
+            }
+            const lead = areas[areaLabels[0].slice('area:'.length)];
+            if (!lead) {
+              core.warning(`No lead mapped for ${areaLabels[0]} in .github/area-leads.json.`);
+              return;
+            }
+
+            const { organization } = await github.graphql(
+              `query($org: String!, $number: Int!, $field: String!) {
+                organization(login: $org) {
+                  projectV2(number: $number) {
+                    id
+                    field(name: $field) {
+                      ... on ProjectV2SingleSelectField { id options { id name } }
+                    }
+                  }
+                }
+              }`,
+              { org: PROJECT_OWNER, number: PROJECT_NUMBER, field: FIELD_NAME },
+            );
+            const project = organization.projectV2;
+            const option = project.field?.options.find((o) => o.name === lead);
+            if (!option) {
+              core.warning(`Project field "${FIELD_NAME}" has no option "${lead}".`);
+              return;
+            }
+
+            // Returns the existing item if the issue is already on the board.
+            const { addProjectV2ItemById } = await github.graphql(
+              `mutation($project: ID!, $content: ID!) {
+                addProjectV2ItemById(input: { projectId: $project, contentId: $content }) { item { id } }
+              }`,
+              { project: project.id, content: issue.id },
+            );
+
+            await github.graphql(
+              `mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $project, itemId: $item, fieldId: $field,
+                  value: { singleSelectOptionId: $option }
+                }) { projectV2Item { id } }
+              }`,
+              { project: project.id, item: addProjectV2ItemById.item.id, field: project.field.id, option: option.id },
+            );
+            core.info(`Lead reviewer set to ${lead}.`);

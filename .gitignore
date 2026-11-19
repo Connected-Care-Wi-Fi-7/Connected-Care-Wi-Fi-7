@@ -43,3 +43,6 @@ tarpaulin-report.*
 ._*
 Thumbs.db
 Desktop.ini
+
+# --- AI coding tools (local state only; shared rules live in AGENTS.md) ---
+.claude/

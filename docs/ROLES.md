@@ -13,15 +13,24 @@ Being the lead does not mean you do all the work in the area, or only work in th
 
 The Team Lead role from `SPECIFICATION.md` is held by Daniel Harrington alongside leading Sensing & Simulation. It is not a sixth role.
 
-| Area | Lead | Area label | Covers |
-| --- | --- | --- | --- |
-| 1. Platform & Integration | Matej Pechoucek | `area:platform` | `cc-core`, `cc-pipeline`, CI, classifier seam |
-| 2. Sensing & Simulation | Daniel Harrington (Team Lead) | `area:sensing` | `cc-sim`, driver stub, auxiliary sensor hooks |
-| 3. Signal Processing | Ben Dalton | `area:dsp` | `cc-dsp` |
-| 4. Spatial Mapping & Tracking | Daniel Wheeler | `area:mapping` | `cc-mapping` |
-| 5. Dashboard & Alerts | Magizh Umashankar | `area:dashboard`, `area:alerts` | `apps/viewer`, `cc-alerts` |
+| Area | Lead | GitHub | Area label | Covers |
+| --- | --- | --- | --- | --- |
+| 1. Platform & Integration | Matej Pechoucek | `MatejPechoucek` | `area:platform` | `cc-core`, `cc-pipeline`, CI, classifier seam |
+| 2. Sensing & Simulation | Daniel Harrington (Team Lead) | `danielharrington06` | `area:sensing` | `cc-sim`, driver stub, auxiliary sensor hooks |
+| 3. Signal Processing | Ben Dalton | `bendalton409` | `area:dsp` | `cc-dsp` |
+| 4. Spatial Mapping & Tracking | Daniel Wheeler | `Dwheeler4` | `area:mapping` | `cc-mapping` |
+| 5. Dashboard & Alerts | Magizh Umashankar | `Magizh-Shankar` | `area:dashboard`, `area:alerts` | `apps/viewer`, `cc-alerts` |
 
 Issues with `area:project` (spec corrections, licence, ethics, evaluation report) are routed by the Team Lead.
+
+### How review routing works
+
+The lead of an issue's area is its default reviewer. This is automated:
+
+- **Issues.** The issue form's Type, Area and Priority answers become `type:`, `area:` and `priority:` labels. The project board's **Lead reviewer** field is then set to the lead of the issue's `area:` label. Sub-issues are skipped; their parent issue carries the reviewer.
+- **Pull requests.** The PR gets the `area:` label of the issue it closes (`Closes #N`), and a review is requested from that area's lead. If the author is the lead, the Team Lead is requested instead. `.github/CODEOWNERS` also requests the lead when files in their area change.
+
+The area to lead mapping lives in `.github/area-leads.json`. When a lead changes, update that file, `.github/CODEOWNERS`, the table above, and the options of the board's "Lead reviewer" field. A requested review is a default, not a requirement: any team member may approve.
 
 The crates listed here are the planned layout. See `docs/ARCHITECTURE.md`. The "Team goal for M1" lists below are goals for the whole team in that area, not a personal task list for the lead.
 
@@ -33,7 +42,7 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-core` (data contracts, traits, config), `cc-pipeline` (stage wiring), CI, and the fall-classifier seam.
 - **Area label:** `area:platform`.
-- **Requirements:** FR-05 (local edge processing), and FR-03 (integration only, because the model itself comes from the external collaborator).
+- **Requirements:** FR-04 (local edge processing), and FR-02 (fall detection classifier, integration only, because the model itself comes from the external collaborator).
 - **Lead looks after:** keep releases and CI healthy, and act as contact point for the external ML developer.
 - **Team goal for M1:**
   - `cc-core` contracts and the four plug-in traits are merged and documented.
@@ -45,7 +54,7 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-sim` (scripted scenes to synthetic CSI, recording and replay), the hardware driver stub, and the auxiliary sensor hooks.
 - **Area label:** `area:sensing`.
-- **Requirements:** FR-01 (CSI capture pipeline), FR-06 (synthetic and controlled testing with zero PII), FR-10 (sensor fusion hooks).
+- **Requirements:** FR-01 (CSI capture pipeline), FR-05 (synthetic and controlled testing with zero PII), FR-12 (sensor fusion hooks).
 - **Lead looks after:** keep the dataset provenance register and make sure no PII enters the repository.
 - **Team goal for M1:**
   - The simulator produces a stream of `CsiFrame` values for a scripted room scene (walking, sitting, a fall, two occupants).
@@ -56,8 +65,8 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-dsp` (phase sanitisation and unwrapping, Hampel filter, DWT denoising, motion features).
 - **Area label:** `area:dsp`.
-- **Requirements:** FR-01 (the processing side), and FR-13 later if time permits.
-- **Lead looks after:** performance benchmarks, producing the numbers needed for FR-07.
+- **Requirements:** FR-01 (the processing side), and FR-14 (respiration sensing) later if time permits.
+- **Lead looks after:** performance benchmarks, producing the numbers needed for FR-06 (evaluation report).
 - **Team goal for M1:**
   - Phase sanitisation and unwrapping are implemented and tested.
   - The Hampel outlier filter is implemented and tested.
@@ -67,7 +76,7 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-mapping` (room model, voxel grid, centroids, multi-occupant tracking).
 - **Area label:** `area:mapping`.
-- **Requirements:** FR-02 (3D spatial coordinate mapping), FR-08 (multi-occupant tracking).
+- **Requirements:** FR-09 (2D spatial mapping), FR-10 (3D spatial mapping), FR-07 (multi-occupant tracking).
 - **Lead looks after:** accuracy evaluation against ground truth.
 - **Team goal for M1:**
   - The room model and voxel grid are built from the config file.
@@ -78,14 +87,10 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `apps/viewer` (the Bevy desktop app: 3D view, zone editor, alert panel) and `cc-alerts` (zones, rules, debounce, sinks).
 - **Area labels:** `area:dashboard` and `area:alerts`.
-- **Requirements:** FR-04 (spatial triggers), FR-09 (false-alarm mitigation), FR-11 (caregiver dashboard).
+- **Requirements:** FR-03 (spatial triggers), FR-11 (false-alarm mitigation), FR-08 (caregiver dashboard).
 - **Lead looks after:** demo readiness and partner-facing user experience.
 - **Team goal for M1:**
   - The Bevy app has a structure with plugins and a bridge to the pipeline.
   - The 3D room view shows voxels, centroids and tracks from simulated data.
   - `cc-alerts` raises an alert for a zone entry and for a fall event, and writes it to a local log through an `AlertSink`.
   - A scripted fall in the simulator raises an alert that is visible in the app.
-
-## A note on FR-11
-
-`SPECIFICATION.md` describes FR-11 as a "desktop web dashboard". The team has decided the dashboard is part of the native Bevy desktop app. Nothing is hosted beyond localhost. The spec wording will be corrected in a separate issue.
