@@ -3,53 +3,123 @@
 
 use serde::{Deserialize, Serialize};
 
-/// A complex signal measurement. Its units and calibration need review.
+/// Fixed CSI configuration for one program run. Sensing supplies this at startup.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ComplexMeasurement {
+pub struct CsiSession {
+    /// Tensor dimensions and subcarrier indices for this session.
+    pub layout: CsiLayout,
+    /// RF centre frequency in hertz.
+    pub center_frequency_hz: u64,
+    /// Channel bandwidth in hertz.
+    pub channel_bandwidth_hz: u32,
+    /// Spacing between adjacent OFDM tone indices in hertz.
+    pub subcarrier_spacing_hz: u32,
+    /// Linear amplitude units and source scaling.
+    pub amplitude_convention: String,
+}
+
+/// Tensor axes ordered transmit stream, receive chain, then subcarrier.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CsiLayout {
+    /// Number of transmit streams with stable indices during the session.
+    pub tx_count: usize,
+    /// Number of receive chains with stable indices during the session.
+    pub rx_count: usize,
+    /// Actual OFDM tone indices in increasing frequency order; gaps are allowed.
+    pub subcarrier_indices: Vec<i32>,
+}
+
+/// One complex CSI coefficient in the session's amplitude convention.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ComplexCsi {
     /// Real component.
     pub real: f64,
     /// Imaginary component.
     pub imaginary: f64,
 }
 
-/// One measurement with provisional antenna and subcarrier indices.
+/// Contiguous tensor values ordered [tx, rx, subcarrier], subcarrier fastest.
 ///
-/// The BE200 investigation must verify these indices and required metadata.
+/// `None` marks an unavailable value. Deserialized tensors must be checked
+/// against their session layout with `validate_for` before use.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CsiMeasurement {
-    /// Transmitting antenna index.
-    pub transmit_antenna: u32,
-    /// Receiving antenna index.
-    pub receive_antenna: u32,
-    /// Subcarrier index; numbering convention is not yet agreed.
-    pub subcarrier: i32,
-    /// Complex CSI value.
-    pub value: ComplexMeasurement,
+pub struct CsiTensor<T> {
+    values: Vec<Option<T>>,
 }
 
-/// A set of CSI measurements captured at one time.
+impl<T> CsiTensor<T> {
+    /// Constructs a tensor if its length matches the layout.
+    pub fn new(layout: &CsiLayout, values: Vec<Option<T>>) -> Result<Self, &'static str> {
+        let tensor = Self { values };
+        tensor.validate_for(layout)?;
+        Ok(tensor)
+    }
+
+    /// Checks tensor length against the supplied layout, including overflow.
+    pub fn validate_for(&self, layout: &CsiLayout) -> Result<(), &'static str> {
+        let expected = layout
+            .tx_count
+            .checked_mul(layout.rx_count)
+            .and_then(|count| count.checked_mul(layout.subcarrier_indices.len()))
+            .ok_or("CSI layout dimensions overflow")?;
+        if self.values.len() != expected {
+            return Err("CSI tensor length does not match layout");
+        }
+        Ok(())
+    }
+
+    /// Returns a value at checked tensor indices, or `None` for invalid indices.
+    /// An inner `None` represents an unavailable measurement.
+    pub fn get(
+        &self,
+        layout: &CsiLayout,
+        tx: usize,
+        rx: usize,
+        subcarrier: usize,
+    ) -> Option<&Option<T>> {
+        self.validate_for(layout).ok()?;
+        if tx >= layout.tx_count
+            || rx >= layout.rx_count
+            || subcarrier >= layout.subcarrier_indices.len()
+        {
+            return None;
+        }
+        let index = (tx * layout.rx_count + rx) * layout.subcarrier_indices.len() + subcarrier;
+        self.values.get(index)
+    }
+}
+
+/// CSI measurements from one capture instant in the active session.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CsiFrame {
-    /// Capture time; units and epoch are provisional.
-    pub timestamp: u64,
-    /// Source identifier; its allocation convention is provisional.
-    pub source_id: u64,
-    /// Captured measurements; format and metadata require hardware review.
-    pub measurements: Vec<CsiMeasurement>,
+    /// Nanoseconds since the session time origin, preserved during replay.
+    pub captured_at_ns: u64,
+    /// Complex measurements interpreted using the active session layout.
+    pub csi: CsiTensor<ComplexCsi>,
 }
 
-/// Signal-processing output for mapping.
-///
-/// Preserving complex CSI values is provisional: DSP may need a different
-/// representation or a time window rather than one capture timestamp.
+/// Processed signal and feature values at one tensor position.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProcessedSample {
+    /// Denoised linear amplitude before background subtraction.
+    pub amplitude: f64,
+    /// Corrected, unwrapped phase in radians, if available.
+    pub phase_rad: Option<f64>,
+    /// Signed amplitude residual after background subtraction.
+    pub dynamic_amplitude: f64,
+    /// Temporal variance; definition, units and window require agreement.
+    pub variance: Option<f64>,
+}
+
+/// DSP output for one capture, using the active session layout.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProcessedFrame {
-    /// Capture time of the underlying data; units and epoch are provisional.
-    pub timestamp: u64,
-    /// Identifier of the source of the underlying data.
-    pub source_id: u64,
-    /// Processed measurements; shape and meaning require DSP review.
-    pub measurements: Vec<CsiMeasurement>,
+    /// Capture time in nanoseconds since the session origin, not processing time.
+    pub captured_at_ns: u64,
+    /// Processed values; unavailable positions contain `None`.
+    pub signals: CsiTensor<ProcessedSample>,
+    /// Aggregate motion feature, if available; formula and units need agreement.
+    pub motion_energy: Option<f64>,
 }
 
 /// Provisional occupancy state; a continuous estimate may be needed instead.

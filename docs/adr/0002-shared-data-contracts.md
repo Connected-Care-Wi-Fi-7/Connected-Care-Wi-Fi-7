@@ -20,17 +20,21 @@ We will define the six shared types in `cc-core`, independent of Bevy and hardwa
 - **Bounds and cells:** the lower boundary is included and the far boundary excluded on each axis. Grid cells follow the same lower-inclusive, upper-exclusive rule. Where an area dimension is not divisible by the voxel size, include a partial cell at the far edge; positions outside the mapped area remain outside even if the nominal cell extends beyond it.
 - **Height:** an unknown centroid height is represented separately from zero; the draft uses `Option<f64>`.
 - **Occupancy:** the frame carries grid origin, dimensions and voxel size. The draft stores cells x-fastest, then y, then z, using unknown, empty and occupied states.
-- **Time:** timestamps distinguish capture, estimate-valid, fall-event and alert-creation times. The draft uses `u64` fields pending a unit and epoch.
-- **CSI:** each draft complex measurement carries transmit-antenna, receive-antenna and subcarrier indices. Numbering is pending review.
+- **Time:** CSI and processed frames carry capture time in nanoseconds since the session time origin, preserved in replay. Occupancy, track, fall-event and alert timestamps use `u64` pending an agreed unit and epoch.
+- **CSI:** one program run uses one session, initialised by Sensing, with a fixed layout and radio configuration. Tensors are ordered `[tx_stream, rx_chain, subcarrier]`, with subcarrier varying fastest and actual tone indices recorded in increasing frequency order. Unavailable values are represented separately from zero.
+- **Replay:** a recording must retain the session configuration alongside its frames. A layout change requires a new program session; the recording and replay implementations are outside this ADR.
+- **Processing:** processed samples retain denoised amplitude, unwrapped phase and background-subtracted amplitude, plus optional variance and motion energy features. Their exact feature definitions remain open.
 - **Tracks and events:** a track ID is temporary, not a person's identity. Tracks carry their latest estimate; a fall or alert may have no track ID.
 
 ## Open questions
 
 - Can simulation, mapping and the viewer use the proposed origin, axis directions, boundary rules and partial cells? How will each deployment choose the physical origin and share a frame across rooms?
 - Can the mapping method produce the proposed three occupancy states, or do its consumers need continuous values or uncertainty information?
-- What timestamp unit, epoch and clock conversions will simulation, replay and hardware use? Which instant or interval represents a processing window?
-- Does the BE200 tooling investigated in #8 provide complex measurements and transmit/receive antenna and subcarrier indices as drafted? What indexing, units and additional metadata does it actually supply?
+- What establishes the session time origin, and how are session-relative timestamps related to other timestamps and clocks? Which instant or interval represents a processing window?
+- Does the BE200 tooling investigated in #8 provide the proposed complex tensor, stable stream/chain indexing, tone indices and radio metadata?
 - Can Signal Processing produce the drafted `ProcessedFrame`, and does it retain the information needed by the chosen localisation method?
+- What input signal, window, formula and units define variance and motion energy for Mapping?
+- How will the pipeline verify tensor lengths against the active session, including after deserialization, and reject mismatches?
 - Can the classifier supply a track association and event time, and do its output and the alert fields meet the collaborator's and dashboard's needs?
 
 ## Consequences

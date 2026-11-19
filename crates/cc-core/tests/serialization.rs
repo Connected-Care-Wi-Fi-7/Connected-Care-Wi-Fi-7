@@ -1,6 +1,7 @@
 use cc_core::{
-    Alert, AlertKind, ComplexMeasurement, CsiFrame, CsiMeasurement, FallEvent, OccupancyFrame,
-    OccupancyGrid, OccupancyState, Position, ProcessedFrame, Track,
+    Alert, AlertKind, ComplexCsi, CsiFrame, CsiLayout, CsiSession, CsiTensor, FallEvent,
+    OccupancyFrame, OccupancyGrid, OccupancyState, Position, ProcessedFrame, ProcessedSample,
+    Track,
 };
 use serde::{Serialize, de::DeserializeOwned};
 use serde_json::{Value, json};
@@ -12,50 +13,123 @@ fn assert_round_trip<T: Serialize + DeserializeOwned>(value: &T, expected: Value
     assert_eq!(serde_json::to_value(decoded).unwrap(), expected);
 }
 
-fn measurement() -> CsiMeasurement {
-    CsiMeasurement {
-        transmit_antenna: 1,
-        receive_antenna: 2,
-        subcarrier: -3,
-        value: ComplexMeasurement {
-            real: 1.25,
-            imaginary: -0.5,
-        },
+fn layout() -> CsiLayout {
+    CsiLayout {
+        tx_count: 1,
+        rx_count: 1,
+        subcarrier_indices: vec![-3, 2],
     }
+}
+
+#[test]
+fn csi_session_round_trip() {
+    let session = CsiSession {
+        layout: layout(),
+        center_frequency_hz: 5_000_000_000,
+        channel_bandwidth_hz: 20_000_000,
+        subcarrier_spacing_hz: 312_500,
+        amplitude_convention: "source-scaled linear".into(),
+    };
+    assert_round_trip(
+        &session,
+        json!({
+            "layout": {"tx_count": 1, "rx_count": 1, "subcarrier_indices": [-3, 2]},
+            "center_frequency_hz": 5_000_000_000u64, "channel_bandwidth_hz": 20_000_000,
+            "subcarrier_spacing_hz": 312_500, "amplitude_convention": "source-scaled linear"
+        }),
+    );
 }
 
 #[test]
 fn csi_frame_round_trip() {
     let frame = CsiFrame {
-        timestamp: 12,
-        source_id: 4,
-        measurements: vec![measurement()],
+        captured_at_ns: 12,
+        csi: CsiTensor::new(
+            &layout(),
+            vec![
+                Some(ComplexCsi {
+                    real: 1.25,
+                    imaginary: -0.5,
+                }),
+                None,
+            ],
+        )
+        .unwrap(),
     };
     assert_round_trip(
         &frame,
-        json!({
-            "timestamp": 12, "source_id": 4,
-            "measurements": [{"transmit_antenna": 1, "receive_antenna": 2,
-                "subcarrier": -3, "value": {"real": 1.25, "imaginary": -0.5}}]
-        }),
+        json!({"captured_at_ns": 12,
+        "csi": {"values": [{"real": 1.25, "imaginary": -0.5}, null]}}),
     );
 }
 
 #[test]
 fn processed_frame_round_trip() {
     let frame = ProcessedFrame {
-        timestamp: 13,
-        source_id: 5,
-        measurements: vec![measurement()],
+        captured_at_ns: 13,
+        signals: CsiTensor::new(
+            &layout(),
+            vec![
+                Some(ProcessedSample {
+                    amplitude: 1.25,
+                    phase_rad: Some(7.0),
+                    dynamic_amplitude: -0.5,
+                    variance: None,
+                }),
+                None,
+            ],
+        )
+        .unwrap(),
+        motion_energy: Some(2.0),
     };
     assert_round_trip(
         &frame,
-        json!({
-            "timestamp": 13, "source_id": 5,
-            "measurements": [{"transmit_antenna": 1, "receive_antenna": 2,
-                "subcarrier": -3, "value": {"real": 1.25, "imaginary": -0.5}}]
-        }),
+        json!({"captured_at_ns": 13,
+        "signals": {"values": [{"amplitude": 1.25, "phase_rad": 7.0,
+            "dynamic_amplitude": -0.5, "variance": null}, null]}, "motion_energy": 2.0}),
     );
+}
+
+#[test]
+fn tensor_validates_length_and_indices() {
+    let dimensions = CsiLayout {
+        tx_count: 2,
+        rx_count: 2,
+        subcarrier_indices: vec![-1, 1],
+    };
+    assert!(CsiTensor::new(&dimensions, vec![Some(0); 7]).is_err());
+    let tensor = CsiTensor::new(
+        &dimensions,
+        vec![
+            Some(0),
+            None,
+            Some(2),
+            Some(3),
+            Some(4),
+            Some(5),
+            Some(6),
+            Some(7),
+        ],
+    )
+    .unwrap();
+    assert_eq!(tensor.get(&dimensions, 0, 0, 1), Some(&None));
+    assert_eq!(tensor.get(&dimensions, 1, 0, 0), Some(&Some(4)));
+    assert_eq!(tensor.get(&dimensions, 2, 0, 0), None);
+    assert_eq!(tensor.get(&dimensions, 0, 2, 0), None);
+    assert_eq!(tensor.get(&dimensions, 0, 0, 2), None);
+}
+
+#[test]
+fn deserialized_tensor_must_be_checked_against_layout() {
+    let tensor: CsiTensor<i32> = serde_json::from_str(r#"{"values":[1]}"#).unwrap();
+    assert!(tensor.validate_for(&layout()).is_err());
+    assert_eq!(tensor.get(&layout(), 0, 0, 0), None);
+    let overflow = CsiLayout {
+        tx_count: usize::MAX,
+        rx_count: 2,
+        subcarrier_indices: vec![0],
+    };
+    assert!(tensor.validate_for(&overflow).is_err());
 }
 
 #[test]
