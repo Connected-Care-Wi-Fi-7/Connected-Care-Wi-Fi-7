@@ -139,6 +139,7 @@ fn occupancy_frame_round_trip() {
         grid: OccupancyGrid {
             origin: [0.0, 1.0, 2.0],
             dimensions: [3, 1, 1],
+            extent: [1.25, 0.5, 0.5],
             voxel_size: [0.5, 0.5, 0.5],
             cells: vec![
                 OccupancyState::Unknown,
@@ -156,7 +157,7 @@ fn occupancy_frame_round_trip() {
         &frame,
         json!({
             "timestamp": 14,
-            "grid": {"origin": [0.0, 1.0, 2.0], "dimensions": [3, 1, 1],
+            "grid": {"origin": [0.0, 1.0, 2.0], "dimensions": [3, 1, 1], "extent": [1.25, 0.5, 0.5],
                 "voxel_size": [0.5, 0.5, 0.5], "cells": ["Unknown", "Empty", "Occupied"]},
             "centroids": [{"x": 1.0, "y": 2.0, "z": null}]
         }),

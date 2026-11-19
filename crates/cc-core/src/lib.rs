@@ -4,6 +4,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Fixed CSI configuration for one program run. Sensing supplies this at startup.
+/// The first captured frame defines session time zero; replay preserves offsets.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CsiSession {
     /// Tensor dimensions and subcarrier indices for this session.
@@ -134,14 +135,14 @@ pub enum OccupancyState {
 }
 
 /// A grid of occupancy states in the project's coordinate frame.
-///
-/// Grid ordering, edge cells, and whether this covers multiple rooms need review.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OccupancyGrid {
     /// Grid origin in metres, ordered x, y, z.
     pub origin: [f64; 3],
     /// Number of cells along x, y, and z respectively.
     pub dimensions: [u32; 3],
+    /// Exact physical extent in metres along x, y, and z, before cell padding.
+    pub extent: [f64; 3],
     /// Cell size in metres along x, y, and z respectively.
     pub voxel_size: [f64; 3],
     /// Cell values in x-fastest order, then y, then z.
@@ -151,7 +152,7 @@ pub struct OccupancyGrid {
 /// Occupancy estimates and detected centroids at one point in time.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OccupancyFrame {
-    /// Time when the estimate applies; units and epoch are provisional.
+    /// Estimate-valid time in nanoseconds since the CSI session's first capture.
     pub timestamp: u64,
     /// Estimated occupancy grid.
     pub grid: OccupancyGrid,
@@ -159,7 +160,7 @@ pub struct OccupancyFrame {
     pub centroids: Vec<Position>,
 }
 
-/// A position in the agreed coordinate frame, measured in metres.
+/// A position in the proposed coordinate frame, measured in metres.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Position {
     /// Horizontal position along the x-axis in metres.
@@ -177,14 +178,14 @@ pub struct Track {
     pub id: u64,
     /// Estimated centroid position.
     pub position: Position,
-    /// Time when the position estimate was valid; units and epoch are provisional.
+    /// Estimate-valid time in nanoseconds since the CSI session's first capture.
     pub timestamp: u64,
 }
 
 /// A possible fall detected by the classifier.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FallEvent {
-    /// Estimated event time; units and epoch are provisional.
+    /// Estimated fall time in nanoseconds since the CSI session's first capture.
     pub timestamp: u64,
     /// Associated track, if known.
     pub track_id: Option<u64>,
@@ -204,7 +205,7 @@ pub enum AlertKind {
 pub struct Alert {
     /// Identifier for this alert.
     pub id: u64,
-    /// Alert creation time; units and epoch are provisional.
+    /// Alert creation time in nanoseconds since the CSI session's first capture.
     pub timestamp: u64,
     /// Reason the alert was raised.
     pub kind: AlertKind,
