@@ -13,6 +13,10 @@ name: Lead approval
 # check does not depend on pr-reviewer.yml having labelled the PR first. The
 # lead mapping is read from the base branch, so a PR cannot change who must
 # approve it.
+#
+# The result is one commit status named "Lead approval" on the head commit.
+# Every run (push or review) overwrites it, so an old failed run can never
+# leave a stale red check behind. The job itself always succeeds.
 
 on:
   pull_request:
@@ -24,6 +28,7 @@ permissions:
   contents: read
   issues: read
   pull-requests: read
+  statuses: write
 
 concurrency:
   group: lead-approval-${{ github.event.pull_request.number }}
@@ -31,7 +36,7 @@ concurrency:
 
 jobs:
   lead-approval:
-    name: Lead approval
+    name: Check lead approval
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v8
@@ -41,6 +46,14 @@ jobs:
             const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
             const author = pr.user.login.toLowerCase();
             const headSha = pr.head.sha;
+            const report = async (state, description) => {
+              await github.rest.repos.createCommitStatus({
+                ...context.repo, sha: headSha, state, context: 'Lead approval',
+                description: description.slice(0, 140),
+                target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              });
+              core.info(`${state}: ${description}`);
+            };
 
             const { data: file } = await github.rest.repos.getContent({
               ...context.repo, path: '.github/area-leads.json', ref: pr.base.sha,
@@ -65,7 +78,7 @@ jobs:
             }
 
             if (areaNames.size === 0) {
-              core.setFailed('No area: label on this PR or its linked issue. Add `Closes #<issue>` to the description or an area: label to the PR.');
+              await report('failure','No area: label on this PR or its linked issue. Add `Closes #<issue>` to the description or an area: label to the PR.');
               return;
             }
 
@@ -74,12 +87,12 @@ jobs:
             for (const area of areaNames) {
               const lead = areas[area];
               if (!lead) {
-                core.setFailed(`No lead mapped for area:${area} in .github/area-leads.json.`);
+                await report('failure',`No lead mapped for area:${area} in .github/area-leads.json.`);
                 return;
               }
               const pick = [lead, teamLead, backupReviewer].find((p) => p && p.toLowerCase() !== author);
               if (!pick) {
-                core.setFailed(`No lead reviewer other than the author for area:${area}.`);
+                await report('failure',`No lead reviewer other than the author for area:${area}.`);
                 return;
               }
               required.add(pick.toLowerCase());
@@ -107,7 +120,7 @@ jobs:
             }
 
             if (missing.length > 0) {
-              core.setFailed(`Waiting for the lead reviewer: ${missing.join('; ')}.`);
+              await report('failure',`Waiting for the lead reviewer: ${missing.join('; ')}.`);
               return;
             }
-            core.info(`Approved by the lead reviewer: ${[...required].join(', ')}.`);
+            await report('success', `Approved by the lead reviewer: ${[...required].join(', ')}.`);
