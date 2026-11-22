@@ -75,7 +75,7 @@ body:
     attributes:
       label: Hardware dependency
       options:
-        - None
+        - No hardware
         - Simulator only
         - Needs hardware
     validations:
