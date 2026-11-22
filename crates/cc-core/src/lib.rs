@@ -3,9 +3,11 @@
 
 use serde::{Deserialize, Serialize};
 
+mod aux_sensor;
 mod csi_source;
 mod fall_classifier;
 
+pub use aux_sensor::{AuxReading, AuxSensor, AuxSensorError};
 pub use csi_source::{CsiPoll, CsiSource, CsiSourceError};
 pub use fall_classifier::{FallClassifier, FallClassifierError};
 

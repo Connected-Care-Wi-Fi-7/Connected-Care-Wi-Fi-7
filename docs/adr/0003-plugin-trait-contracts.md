@@ -31,6 +31,14 @@ successful update returns a vector of `FallEvent`s, which may be empty or
 contain multiple events. Event timestamps are session-relative and track
 associations are optional. Failures use a concrete `thiserror` error type.
 
+We will use a synchronous, `dyn`-compatible `AuxSensor` trait with a `Send`
+bound. Polling returns a new `AuxReading`, no new reading, or a concrete
+`thiserror` error. The provisional reading carries a binary activation state
+and an observation time in nanoseconds since the first CSI capture. The fake
+uses that timeline directly. Future adapters must align any separate sensor
+clock before supplying readings. The reading format can be revisited when
+real sensor requirements are known.
+
 ## Consequences
 
 The simulator, replay and future hardware drivers can expose the same interface.
