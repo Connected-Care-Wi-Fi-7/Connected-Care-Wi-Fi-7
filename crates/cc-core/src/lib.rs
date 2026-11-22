@@ -3,6 +3,10 @@
 
 use serde::{Deserialize, Serialize};
 
+mod csi_source;
+
+pub use csi_source::{CsiPoll, CsiSource, CsiSourceError};
+
 /// Fixed CSI configuration for one program run. Sensing supplies this at startup.
 /// The first captured frame defines session time zero; replay preserves offsets.
 #[derive(Debug, Clone, Serialize, Deserialize)]
