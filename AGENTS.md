@@ -87,9 +87,9 @@ These are hard requirements (FR-04 local edge processing, FR-05 privacy-first te
 - CI (`.github/workflows/ci.yml`) must be green. PRs are squash-merged.
 - Do not commit, push, open PRs, create issues or edit the project board unless the user asked you to.
 
-## No AI attribution
+## AI-assisted work
 
-This rule applies to the whole team. Do not add `Co-Authored-By` trailers for AI tools to commits. Do not add "Generated with ..." footers to PRs, and do not mention AI tools in issues, comments or documentation. The human who submits the work is its author.
+The full rule is in "AI-assisted work" in `CONTRIBUTING.md`. In short: the human who submits the work is its author. Never act under an AI tool's own GitHub account, do not add `Co-Authored-By` trailers for AI tools to commits, do not add "Generated with ..." footers to pull requests, and never add links to AI tool sessions or chat threads, or hidden attribution comments. A short, plain one-line disclosure in an issue or pull request description is allowed, for example "The fix was handed off to Claude and reviewed by me."
 
 ## Reviews
 

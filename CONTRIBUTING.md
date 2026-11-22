@@ -82,6 +82,16 @@ The project processes zero personally identifiable information (PII) (FR-05, pri
 - Use simulated data by default. Use public datasets only after recording them in the provenance register.
 - **Dataset provenance register.** Once the first dataset is used, create `docs/DATA_PROVENANCE.md`. Add one entry per dataset giving its name, where it came from (link), its licence, the date it was obtained, what the team uses it for, and confirmation that it contains no PII. A dataset with no entry must not be used.
 
+## AI-assisted work
+
+AI tools may be used. The person who submits the work is its author and is responsible for it: they must understand it and be able to explain it.
+
+- AI tools never contribute under their own GitHub account. Every commit, issue, pull request and comment comes from a team member's account.
+- Do not add `Co-Authored-By` trailers for AI tools to commits, and do not add promotional "Generated with ..." footers to pull requests.
+- Do not add links to AI tool sessions or chat threads, or hidden attribution comments, to commits, issues, pull requests or comments.
+- A short, plain one-line disclosure is allowed in an issue or pull request description, for example "The fix was handed off to Claude and reviewed by me."
+- This does not replace any declaration the module requires for assessed work. Follow the module's own rules on declaring AI use.
+
 ## Labels
 
 Every issue carries one label from each of these groups. A workflow (`.github/workflows/issue-triage.yml`) applies them from the issue form answers when the issue is opened. Labels you set by hand are never overwritten.
