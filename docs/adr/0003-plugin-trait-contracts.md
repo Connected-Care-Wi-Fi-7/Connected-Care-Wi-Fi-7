@@ -45,6 +45,13 @@ it according to its documented contract. A sink that cannot confirm acceptance
 returns a concrete `thiserror` error. Retry and user acknowledgement are
 tracked in issue #42.
 
+We will load local plug-in selections as TOML in `cc-core` using the
+workspace's `toml` crate. The config requires a name for each trait. The
+loader returns typed selections and reports unknown names with their field
+and supplied value. The caller maps the selections to implementations.
+The `fake` names support tests, with the implementations owned by the tests.
+The production factory belongs in `cc-pipeline`.
+
 ## Consequences
 
 The simulator, replay and future hardware drivers can expose the same interface.
