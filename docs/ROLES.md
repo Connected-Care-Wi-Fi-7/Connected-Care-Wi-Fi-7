@@ -9,7 +9,7 @@ Being the lead of an area means you:
 - are the default first reviewer for pull requests that touch it,
 - look after one cross-cutting duty that helps the whole team.
 
-Being the lead does not mean you do all the work in the area, or only work in that area. Issues are not assigned by area. Anyone takes any open issue by assigning themselves, and people are expected to work outside their own area regularly. If the lead is busy or away, any other team member can review.
+Being the lead does not mean you do all the work in the area, or only work in that area. Issues are not assigned by area. Anyone takes any open issue by assigning themselves, and people are expected to work outside their own area regularly. If the lead is busy or away, any other team member can review, but merging still needs the lead reviewer's approval (see "How review routing works").
 
 The Team Lead role from `SPECIFICATION.md` is held by Daniel Harrington alongside leading Sensing & Simulation. It is not a sixth role.
 
@@ -29,8 +29,9 @@ The lead of an issue's area is its default reviewer. This is automated:
 
 - **Issues.** The issue form's Type, Area and Priority answers become `type:`, `area:` and `priority:` labels. The project board's **Lead reviewer** field is then set to the lead of the issue's `area:` label. Sub-issues are skipped; their parent issue carries the reviewer.
 - **Pull requests.** The PR gets the `area:` label of the issue it closes (`Closes #N`), and a review is requested from that area's lead. If the author is the lead, the Team Lead is requested instead. If the author is also the Team Lead, the backup reviewer from `.github/area-leads.json` is requested instead, so someone is always asked to review. Once the PR is ready for review it is added to the project board, and its **Lead reviewer** field is set to the same person. `.github/CODEOWNERS` also requests the lead when files in their area change.
+- **Merging.** That same person, the PR's lead reviewer, must approve it before it can merge. The required "Lead approval" check (`.github/workflows/lead-approval.yml`) passes only when the lead reviewer of every area on the PR has approved its latest commit, so each new push needs a fresh approval. Anyone else may review and approve too, but that does not replace the lead reviewer's approval.
 
-The area to lead mapping lives in `.github/area-leads.json`. When a lead changes, update that file, `.github/CODEOWNERS`, the table above, and the options of the board's "Lead reviewer" field. A requested review is a default, not a requirement: any team member may approve.
+The area to lead mapping lives in `.github/area-leads.json`. When a lead changes, update that file, `.github/CODEOWNERS`, the table above, and the options of the board's "Lead reviewer" field. If a lead reviewer is away, change the lead in `.github/area-leads.json` through a PR; nobody can bypass the merge rules.
 
 The crates listed here are the planned layout. See `docs/ARCHITECTURE.md`. The "Team goal for M1" lists below are goals for the whole team in that area, not a personal task list for the lead.
 
