@@ -2,8 +2,9 @@ name: PR reviewer
 
 # Copies the area: label from the issue a PR closes and requests a review from
 # that area's lead (.github/area-leads.json). If the author is the lead, the
-# Team Lead is requested instead. It also adds the PR to the project board and
-# sets the board's "Lead reviewer" field to the same person.
+# Team Lead is requested instead, and if the author is also the Team Lead, the
+# backup reviewer. It also adds the PR to the project board and sets the
+# board's "Lead reviewer" field to the same person.
 #
 # pull_request_target runs with the base branch's workflow and mapping file,
 # so a PR cannot change who it gets routed to. PR code is never checked out.
@@ -37,9 +38,12 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const { teamLead, areas } = JSON.parse(fs.readFileSync('.github/area-leads.json', 'utf8'));
+            const { teamLead, backupReviewer, areas } = JSON.parse(fs.readFileSync('.github/area-leads.json', 'utf8'));
             const pr = context.payload.pull_request;
             const author = pr.user.login;
+            // Area lead, then Team Lead, then backup reviewer: the first who is not the author.
+            const pickReviewer = (lead) =>
+              [lead, teamLead, backupReviewer].find((p) => p && p.toLowerCase() !== author.toLowerCase());
             const MARKER = '<!-- pr-reviewer:no-linked-issue -->';
 
             const linked = [...(pr.body || '').matchAll(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi)]
@@ -83,8 +87,8 @@ jobs:
             for (const label of areaLabels) {
               const lead = areas[label.slice('area:'.length)];
               if (!lead) { core.warning(`No lead mapped for ${label}.`); continue; }
-              const pick = lead.toLowerCase() === author.toLowerCase() ? teamLead : lead;
-              if (pick.toLowerCase() !== author.toLowerCase()) reviewers.add(pick);
+              const pick = pickReviewer(lead);
+              if (pick) reviewers.add(pick);
             }
 
             const already = new Set(pr.requested_reviewers.map((r) => r.login.toLowerCase()));
@@ -107,7 +111,7 @@ jobs:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
             const fs = require('fs');
-            const { teamLead, areas } = JSON.parse(fs.readFileSync('.github/area-leads.json', 'utf8'));
+            const { teamLead, backupReviewer, areas } = JSON.parse(fs.readFileSync('.github/area-leads.json', 'utf8'));
             const PROJECT_OWNER = context.repo.owner;
             const PROJECT_NUMBER = 2;
             const FIELD_NAME = 'Lead reviewer';
@@ -160,10 +164,12 @@ jobs:
               core.warning(`No lead mapped for ${areaLabels[0]} in .github/area-leads.json.`);
               return;
             }
-            // Same rule as the review request: the Team Lead reviews the lead's own PRs.
-            const pick = lead.toLowerCase() === author.toLowerCase() ? teamLead : lead;
-            if (pick.toLowerCase() === author.toLowerCase()) {
-              core.info(`Author ${author} is both area lead and Team Lead; not setting ${FIELD_NAME}.`);
+            // Same rule as the review request: area lead, then Team Lead, then
+            // backup reviewer, skipping the author.
+            const pick = [lead, teamLead, backupReviewer]
+              .find((p) => p && p.toLowerCase() !== author.toLowerCase());
+            if (!pick) {
+              core.info(`No reviewer other than the author ${author}; not setting ${FIELD_NAME}.`);
               return;
             }
 

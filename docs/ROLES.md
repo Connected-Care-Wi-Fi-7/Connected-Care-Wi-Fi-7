@@ -28,7 +28,7 @@ Issues with `area:project` (spec corrections, licence, ethics, evaluation report
 The lead of an issue's area is its default reviewer. This is automated:
 
 - **Issues.** The issue form's Type, Area and Priority answers become `type:`, `area:` and `priority:` labels. The project board's **Lead reviewer** field is then set to the lead of the issue's `area:` label. Sub-issues are skipped; their parent issue carries the reviewer.
-- **Pull requests.** The PR gets the `area:` label of the issue it closes (`Closes #N`), and a review is requested from that area's lead. If the author is the lead, the Team Lead is requested instead. Once the PR is ready for review it is added to the project board, and its **Lead reviewer** field is set to the same person. `.github/CODEOWNERS` also requests the lead when files in their area change.
+- **Pull requests.** The PR gets the `area:` label of the issue it closes (`Closes #N`), and a review is requested from that area's lead. If the author is the lead, the Team Lead is requested instead. If the author is also the Team Lead, the backup reviewer from `.github/area-leads.json` is requested instead, so someone is always asked to review. Once the PR is ready for review it is added to the project board, and its **Lead reviewer** field is set to the same person. `.github/CODEOWNERS` also requests the lead when files in their area change.
 
 The area to lead mapping lives in `.github/area-leads.json`. When a lead changes, update that file, `.github/CODEOWNERS`, the table above, and the options of the board's "Lead reviewer" field. A requested review is a default, not a requirement: any team member may approve.
 
