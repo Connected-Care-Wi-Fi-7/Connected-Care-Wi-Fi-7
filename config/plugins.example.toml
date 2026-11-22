@@ -1,0 +1,5 @@
+# These names select the in-memory implementations used by the integration test.
+csi_source = "fake"
+fall_classifier = "fake"
+aux_sensor = "fake"
+alert_sink = "fake"
