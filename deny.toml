@@ -1,0 +1,82 @@
+# cargo-deny configuration (issue #7).
+#
+# Enforces FR-04 (local edge processing, zero cloud dependency) and the
+# dependency rules in CONTRIBUTING.md automatically in CI. Run locally with
+# `cargo deny check`. Docs: https://embarkstudios.github.io/cargo-deny/
+
+[graph]
+# Empty means every platform is checked, including ones we never ship.
+targets = []
+
+[advisories]
+# Known vulnerabilities, unmaintained and yanked crates from the RustSec
+# database. Add an entry here only with a reason, for example:
+# { id = "RUSTSEC-0000-0000", reason = "only reachable on wasm; we never ship wasm" }
+ignore = []
+
+[licenses]
+# Permissive licences only. This list matches what the dependency tree actually
+# uses; a licence that is not encountered should be removed. Copyleft licences
+# (GPL, LGPL, AGPL) are deliberately absent: Rust links statically, so even
+# LGPL would bring relinking obligations. If one crate ever needs another
+# licence, add a per-crate entry to `exceptions` instead of widening this list.
+allow = [
+    "MIT",
+    "MIT-0",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Zlib",
+]
+confidence-threshold = 0.8
+exceptions = []
+
+[licenses.private]
+# Our own workspace crates are `publish = false` and carry no licence field.
+ignore = true
+
+[bans]
+# Bevy pulls in several versions of some crates (windows-sys, bitflags, ...).
+# That is outside our control, so report it without failing CI.
+multiple-versions = "warn"
+wildcards = "allow"
+
+# Crates that make or serve network connections. The app runs entirely on the
+# local machine (FR-04), so none of these should ever appear in the tree.
+# MQTT clients are deliberately not listed: off-machine alert sinks are out of
+# scope for #7, not forbidden, and need a team decision first.
+deny = [
+    # HTTP clients
+    { crate = "reqwest", reason = "outbound HTTP client; FR-04 zero cloud" },
+    { crate = "ureq", reason = "outbound HTTP client; FR-04 zero cloud" },
+    { crate = "isahc", reason = "outbound HTTP client; FR-04 zero cloud" },
+    { crate = "surf", reason = "outbound HTTP client; FR-04 zero cloud" },
+    { crate = "attohttpc", reason = "outbound HTTP client; FR-04 zero cloud" },
+    { crate = "awc", reason = "outbound HTTP client; FR-04 zero cloud" },
+    { crate = "curl", reason = "libcurl bindings; FR-04 zero cloud" },
+    { crate = "curl-sys", reason = "libcurl bindings; FR-04 zero cloud" },
+    # HTTP / transport stacks
+    { crate = "hyper", reason = "HTTP client and server stack; the UI is native Bevy, so no web server is needed. Open an issue if a localhost-only dashboard is ever wanted" },
+    { crate = "h2", reason = "HTTP/2 stack; FR-04 zero cloud" },
+    { crate = "quinn", reason = "QUIC transport; FR-04 zero cloud" },
+    # WebSockets
+    { crate = "tungstenite", reason = "WebSocket client/server; FR-04 zero cloud" },
+    { crate = "tokio-tungstenite", reason = "WebSocket client/server; FR-04 zero cloud" },
+    { crate = "async-tungstenite", reason = "WebSocket client/server; FR-04 zero cloud" },
+    # TLS: an offline app has no use for it
+    { crate = "rustls", reason = "TLS implies remote connections; FR-04 zero cloud" },
+    { crate = "native-tls", reason = "TLS implies remote connections; FR-04 zero cloud" },
+    { crate = "openssl", reason = "TLS implies remote connections; FR-04 zero cloud" },
+    # Telemetry and crash reporting
+    { crate = "sentry", reason = "crash reporting to a remote service; CONTRIBUTING zero-cloud rules" },
+    { crate = "opentelemetry-otlp", reason = "telemetry export; CONTRIBUTING zero-cloud rules" },
+]
+
+[sources]
+# Every dependency must come from crates.io; no unknown registries or git URLs.
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
