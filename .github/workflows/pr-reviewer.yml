@@ -4,14 +4,15 @@ name: PR reviewer
 # that area's lead (.github/area-leads.json). If the author is the lead, the
 # Team Lead is requested instead, and if the author is also the Team Lead, the
 # backup reviewer. It also adds the PR to the project board and sets the
-# board's "Lead reviewer" field to the same person.
+# board's "Lead reviewer" field to the same person. It runs again on every push,
+# so the lead reviewer is asked to re-approve the new commit.
 #
 # pull_request_target runs with the base branch's workflow and mapping file,
 # so a PR cannot change who it gets routed to. PR code is never checked out.
 
 on:
   pull_request_target:
-    types: [opened, reopened, edited, ready_for_review]
+    types: [opened, reopened, synchronize, edited, ready_for_review]
 
 permissions:
   contents: read
