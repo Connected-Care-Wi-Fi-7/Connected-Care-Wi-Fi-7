@@ -39,6 +39,12 @@ uses that timeline directly. Future adapters must align any separate sensor
 clock before supplying readings. The reading format can be revisited when
 real sensor requirements are known.
 
+We will use a synchronous, `dyn`-compatible `AlertSink` trait with a `Send`
+bound. Publishing borrows an `Alert` and returns success when the sink accepts
+it according to its documented contract. A sink that cannot confirm acceptance
+returns a concrete `thiserror` error. Retry and user acknowledgement are
+tracked in issue #42.
+
 ## Consequences
 
 The simulator, replay and future hardware drivers can expose the same interface.
