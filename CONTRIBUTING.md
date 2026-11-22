@@ -16,7 +16,7 @@ This guide explains how the team works on Connected Care Wi-Fi 7. Read it before
    - `docs: describe the replay file format`
    - `ci: pin the Rust toolchain`
 4. **Open a pull request** against `main`. Fill in the template and put `Closes #<issue number>` under "Linked issue" so the issue closes when the PR merges.
-5. **Review.** One approving review from another team member is required. The lead of the linked issue's area is requested automatically (see "How review routing works" in `docs/ROLES.md`), but anyone may approve. Reviewers check the Definition of Done below.
+5. **Review.** The PR's lead reviewer must approve it: the lead of the linked issue's area, or the Team Lead if you are that lead, or the backup reviewer if you are also the Team Lead. They are requested automatically (see "How review routing works" in `docs/ROLES.md`). Anyone else may review too. Every new push needs a fresh approval, every "Request changes" review must be resolved and every conversation resolved before merging. These rules apply to everyone, admins included. Reviewers check the Definition of Done below.
 6. **CI must be green** before merging.
 7. **Squash merge.** The squashed commit message must also follow Conventional Commits.
 

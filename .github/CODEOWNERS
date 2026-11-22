@@ -1,8 +1,9 @@
 # Area leads, as defined in docs/ROLES.md.
 # Keep in sync with .github/area-leads.json, which drives the review-routing workflows.
 #
-# This file only requests reviews. It is not a required merge check:
-# any team member may approve a pull request.
+# This file only requests reviews. It is not a required merge check: the
+# approval needed to merge comes from the "Lead approval" check, which wants
+# the PR's lead reviewer (see "How review routing works" in docs/ROLES.md).
 # Later lines win when several patterns match.
 
 # Platform & Integration

@@ -1,0 +1,126 @@
+name: Lead approval
+
+# Required check on main. Passes only when the PR's lead reviewer has approved
+# the PR's current head commit, so every new push needs a fresh approval.
+#
+# The lead reviewer is picked per area: label with the same rule as
+# pr-reviewer.yml: the area lead, then the Team Lead if the author is the area
+# lead, then the backup reviewer if the author is also the Team Lead. A PR with
+# several areas needs the lead reviewer of each. Other team members may review
+# and approve, but their approval does not satisfy this check.
+#
+# Areas come from the PR's area: labels and from the issues it closes, so the
+# check does not depend on pr-reviewer.yml having labelled the PR first. The
+# lead mapping is read from the base branch, so a PR cannot change who must
+# approve it.
+#
+# The result is one commit status named "Lead approval" on the head commit.
+# Every run (push or review) overwrites it, so an old failed run can never
+# leave a stale red check behind. The job itself always succeeds.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, labeled, unlabeled, ready_for_review]
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  statuses: write
+
+concurrency:
+  group: lead-approval-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  lead-approval:
+    name: Check lead approval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const number = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
+            const author = pr.user.login.toLowerCase();
+            const headSha = pr.head.sha;
+            const report = async (state, description) => {
+              await github.rest.repos.createCommitStatus({
+                ...context.repo, sha: headSha, state, context: 'Lead approval',
+                description: description.slice(0, 140),
+                target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              });
+              core.info(`${state}: ${description}`);
+            };
+
+            const { data: file } = await github.rest.repos.getContent({
+              ...context.repo, path: '.github/area-leads.json', ref: pr.base.sha,
+            });
+            const { teamLead, backupReviewer, areas } = JSON.parse(Buffer.from(file.content, 'base64').toString('utf8'));
+
+            // Areas from the PR's own labels and from the issues it closes.
+            const areaNames = new Set(
+              pr.labels.map((l) => l.name).filter((n) => n.startsWith('area:')).map((n) => n.slice('area:'.length)),
+            );
+            const linked = [...(pr.body || '').matchAll(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi)]
+              .map((m) => Number(m[1]));
+            for (const issueNumber of linked) {
+              try {
+                const { data } = await github.rest.issues.get({ ...context.repo, issue_number: issueNumber });
+                if (data.pull_request) continue;
+                data.labels.map((l) => l.name).filter((n) => n.startsWith('area:'))
+                  .forEach((n) => areaNames.add(n.slice('area:'.length)));
+              } catch (e) {
+                core.warning(`Could not read #${issueNumber}: ${e.message}`);
+              }
+            }
+
+            if (areaNames.size === 0) {
+              await report('failure','No area: label on this PR or its linked issue. Add `Closes #<issue>` to the description or an area: label to the PR.');
+              return;
+            }
+
+            // Area lead, then Team Lead, then backup reviewer: the first who is not the author.
+            const required = new Set();
+            for (const area of areaNames) {
+              const lead = areas[area];
+              if (!lead) {
+                await report('failure',`No lead mapped for area:${area} in .github/area-leads.json.`);
+                return;
+              }
+              const pick = [lead, teamLead, backupReviewer].find((p) => p && p.toLowerCase() !== author);
+              if (!pick) {
+                await report('failure',`No lead reviewer other than the author for area:${area}.`);
+                return;
+              }
+              required.add(pick.toLowerCase());
+            }
+
+            // Latest approve / request-changes / dismissed review per person.
+            // Plain comments do not change someone's review state.
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              ...context.repo, pull_number: number,
+            });
+            const latest = new Map();
+            for (const r of reviews) {
+              if (!r.user || !['APPROVED', 'CHANGES_REQUESTED', 'DISMISSED'].includes(r.state)) continue;
+              latest.set(r.user.login.toLowerCase(), r);
+            }
+
+            const missing = [];
+            for (const person of required) {
+              const r = latest.get(person);
+              if (!r || r.state !== 'APPROVED') {
+                missing.push(`${person} has not approved`);
+              } else if (r.commit_id !== headSha) {
+                missing.push(`${person} approved an older commit; the latest push needs their approval`);
+              }
+            }
+
+            if (missing.length > 0) {
+              await report('failure',`Waiting for the lead reviewer: ${missing.join('; ')}.`);
+              return;
+            }
+            await report('success', `Approved by the lead reviewer: ${[...required].join(', ')}.`);
