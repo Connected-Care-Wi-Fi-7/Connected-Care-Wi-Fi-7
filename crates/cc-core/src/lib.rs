@@ -4,8 +4,10 @@
 use serde::{Deserialize, Serialize};
 
 mod csi_source;
+mod fall_classifier;
 
 pub use csi_source::{CsiPoll, CsiSource, CsiSourceError};
+pub use fall_classifier::{FallClassifier, FallClassifierError};
 
 /// Fixed CSI configuration for one program run. Sensing supplies this at startup.
 /// The first captured frame defines session time zero; replay preserves offsets.

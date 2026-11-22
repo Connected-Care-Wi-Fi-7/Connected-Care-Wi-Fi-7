@@ -24,6 +24,13 @@ stream. Polling does not wait for a future frame. Read failures use a concrete
 `thiserror` error type that preserves the underlying cause. Replay preserves
 recorded capture timestamps.
 
+We will use a synchronous, `dyn`-compatible `FallClassifier` trait with a
+`Send` bound. Each update borrows a `ProcessedFrame` and the current slice of
+`Track` estimates. The classifier can retain its own rolling window. A
+successful update returns a vector of `FallEvent`s, which may be empty or
+contain multiple events. Event timestamps are session-relative and track
+associations are optional. Failures use a concrete `thiserror` error type.
+
 ## Consequences
 
 The simulator, replay and future hardware drivers can expose the same interface.
@@ -34,3 +41,5 @@ plug-in trait contracts require an ADR and Platform & Integration lead review.
 
 A single optional frame would give the caller no way to tell a temporary gap
 from the end of a recording.
+
+A single optional fall event would limit each classifier update to one fall.
