@@ -4,9 +4,9 @@ use cc_core::{
     ComplexCsi, CsiFrame, CsiLayout, CsiPoll, CsiSession, CsiSource, CsiSourceError, CsiTensor,
 };
 
-struct FakeCsiSource {
-    session: CsiSession,
-    outcomes: VecDeque<Result<CsiPoll, CsiSourceError>>,
+pub(super) struct FakeCsiSource {
+    pub(super) session: CsiSession,
+    pub(super) outcomes: VecDeque<Result<CsiPoll, CsiSourceError>>,
 }
 
 impl CsiSource for FakeCsiSource {
@@ -19,7 +19,7 @@ impl CsiSource for FakeCsiSource {
     }
 }
 
-fn session() -> CsiSession {
+pub(super) fn session() -> CsiSession {
     CsiSession {
         layout: CsiLayout {
             tx_count: 1,

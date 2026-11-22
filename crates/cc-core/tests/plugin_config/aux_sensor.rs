@@ -2,8 +2,8 @@ use std::{collections::VecDeque, io};
 
 use cc_core::{AuxReading, AuxSensor, AuxSensorError};
 
-struct FakeAuxSensor {
-    outcomes: VecDeque<Result<Option<AuxReading>, AuxSensorError>>,
+pub(super) struct FakeAuxSensor {
+    pub(super) outcomes: VecDeque<Result<Option<AuxReading>, AuxSensorError>>,
 }
 
 impl AuxSensor for FakeAuxSensor {

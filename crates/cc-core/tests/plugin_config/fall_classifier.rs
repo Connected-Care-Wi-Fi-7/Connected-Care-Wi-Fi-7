@@ -5,8 +5,8 @@ use cc_core::{
     Track,
 };
 
-struct FakeFallClassifier {
-    outcomes: VecDeque<Result<Vec<FallEvent>, FallClassifierError>>,
+pub(super) struct FakeFallClassifier {
+    pub(super) outcomes: VecDeque<Result<Vec<FallEvent>, FallClassifierError>>,
 }
 
 impl FallClassifier for FakeFallClassifier {

@@ -3,8 +3,8 @@ use std::io;
 use cc_core::{Alert, AlertKind, AlertSink, AlertSinkError};
 
 #[derive(Default)]
-struct FakeAlertSink {
-    received: Vec<Alert>,
+pub(super) struct FakeAlertSink {
+    pub(super) received: Vec<Alert>,
     failure: Option<AlertSinkError>,
 }
 
