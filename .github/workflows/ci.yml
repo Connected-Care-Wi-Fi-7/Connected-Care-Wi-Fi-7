@@ -37,3 +37,12 @@ jobs:
       - run: cargo test --workspace
       - name: Test git hooks
         run: .githooks/test-hooks
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          arguments: --all-features
