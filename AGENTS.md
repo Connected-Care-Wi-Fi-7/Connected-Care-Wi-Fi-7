@@ -89,7 +89,7 @@ These are hard requirements (FR-04 local edge processing, FR-05 privacy-first te
 
 ## AI-assisted work
 
-The full rule is in "AI-assisted work" in `CONTRIBUTING.md`. In short: the human who submits the work is its author. Never act under an AI tool's own GitHub account, do not add `Co-Authored-By` trailers for AI tools to commits, and do not add "Generated with ..." footers to pull requests. A short, plain one-line disclosure in an issue or pull request description is allowed, for example "The fix was handed off to Claude and reviewed by me."
+The full rule is in "AI-assisted work" in `CONTRIBUTING.md`. In short: the human who submits the work is its author. Never act under an AI tool's own GitHub account, do not add `Co-Authored-By` trailers for AI tools to commits, do not add "Generated with ..." footers to pull requests, and never add links to AI tool sessions or chat threads, or hidden attribution comments. A short, plain one-line disclosure in an issue or pull request description is allowed, for example "The fix was handed off to Claude and reviewed by me."
 
 ## Reviews
 

@@ -88,6 +88,7 @@ AI tools may be used. The person who submits the work is its author and is respo
 
 - AI tools never contribute under their own GitHub account. Every commit, issue, pull request and comment comes from a team member's account.
 - Do not add `Co-Authored-By` trailers for AI tools to commits, and do not add promotional "Generated with ..." footers to pull requests.
+- Do not add links to AI tool sessions or chat threads, or hidden attribution comments, to commits, issues, pull requests or comments.
 - A short, plain one-line disclosure is allowed in an issue or pull request description, for example "The fix was handed off to Claude and reviewed by me."
 - This does not replace any declaration the module requires for assessed work. Follow the module's own rules on declaring AI use.
 
