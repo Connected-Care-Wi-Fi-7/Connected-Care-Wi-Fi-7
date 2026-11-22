@@ -49,8 +49,10 @@ We will load local plug-in selections as TOML in `cc-core` using the
 workspace's `toml` crate. The config requires a name for each trait. The
 loader returns typed selections and reports unknown names with their field
 and supplied value. The caller maps the selections to implementations.
-The `fake` names support tests, with the implementations owned by the tests.
-The production factory belongs in `cc-pipeline`.
+The [example TOML](../../config/plugins.example.toml) selects `fake` for all
+four traits. The integration test loads it via `PluginConfig::load` and maps
+the selections to test-owned implementations. The production factory belongs
+in `cc-pipeline`.
 
 ## Consequences
 

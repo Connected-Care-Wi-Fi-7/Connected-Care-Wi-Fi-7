@@ -47,16 +47,35 @@ The data types named above (`CsiFrame`, `ProcessedFrame`, `OccupancyFrame`, `Tra
 
 ## Plug-in traits
 
-Four traits in `cc-core` mark the places where an implementation can be swapped. The responsibilities below are fixed. The exact method signatures are not.
+Four traits in `cc-core` define where the pipeline can swap implementations. See [ADR 0003](adr/0003-plugin-trait-contracts.md) for their contracts.
 
-| Trait | Responsibility | Implemented now by | Implemented later by |
+| Trait | Responsibility | Planned implementations | Later integrations |
 | --- | --- | --- | --- |
 | `CsiSource` | Supplies a stream of CSI frames to the pipeline | Simulator, file replay | A real driver crate such as `cc-driver-be200` |
 | `FallClassifier` | Decides whether a fall has occurred from tracking and motion data | A stub threshold detector | The model from the external collaborator |
 | `AuxSensor` | Supplies readings from complementary sensors to cross-check Wi-Fi detections (FR-12, sensor fusion hooks) | Simulated PIR and pressure pad | Real sensors |
 | `AlertSink` | Delivers an alert somewhere | Local log and in-app alert panel | MQTT, nurse-call or other integrations |
 
-Traits are resolved at compile time. There is no dynamic library loading. Which implementation runs is chosen by a local config file. Real hardware drivers sit behind cargo features, so a normal build and test run never needs hardware.
+Implementations are compiled into the caller, with real hardware drivers behind Cargo features that are off by default. The caller selects among available implementations at startup using a local config file.
+
+### Local plug-in configuration
+
+[The example TOML](../config/plugins.example.toml) has four required, case-sensitive keys. Each currently accepts `"fake"`, which selects the corresponding in-memory test implementation.
+
+| Key | Trait |
+| --- | --- |
+| `csi_source` | `CsiSource` |
+| `fall_classifier` | `FallClassifier` |
+| `aux_sensor` | `AuxSensor` |
+| `alert_sink` | `AlertSink` |
+
+Pass the file path explicitly to `cc_core::PluginConfig::load`. The loader validates the names and returns typed selections. An unknown name produces an error identifying the key and rejected value. The caller matches each selection to a constructor. The integration test performs that step with the in-memory fakes, and `cc-pipeline` will own the production constructors.
+
+Run the example through the integration test from the repository root:
+
+```sh
+cargo test -p cc-core --test plugin_config
+```
 
 ## The dependency rule
 
@@ -81,9 +100,10 @@ With these, every team member can work in parallel from the start, and the Bevy 
 1. Create a new crate, for example `crates/cc-driver-be200`.
 2. Implement the `CsiSource` trait in it. Driver crates are the only place `unsafe` code may be allowed.
 3. Add a cargo feature that enables the crate, off by default.
-4. Select the driver in the local config file instead of the simulator.
+4. Add the driver's name to `cc-core`'s CSI source selection and map that selection to its constructor in `cc-pipeline` under the same Cargo feature.
+5. Select the driver by name in the local config file.
 
-No other crate changes. If the driver cannot be written without changing `CsiFrame`, that is a `cc-core` contract change and needs an ADR.
+Changes to a `cc-core` contract, including a change to `CsiFrame`, require an ADR and review from the Platform & Integration lead.
 
 The same steps apply to a real `AuxSensor` or `AlertSink`.
 

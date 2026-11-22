@@ -15,7 +15,9 @@ impl CsiSource for FakeCsiSource {
     }
 
     fn poll_frame(&mut self) -> Result<CsiPoll, CsiSourceError> {
-        self.outcomes.pop_front().unwrap_or(Ok(CsiPoll::EndOfStream))
+        self.outcomes
+            .pop_front()
+            .unwrap_or(Ok(CsiPoll::EndOfStream))
     }
 }
 
