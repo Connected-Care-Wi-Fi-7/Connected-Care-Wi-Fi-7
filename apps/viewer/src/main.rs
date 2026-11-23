@@ -1,5 +1,14 @@
+//! Connected Care desktop viewer, split into Bevy plugins.
+#![forbid(unsafe_code)]
 // No console window behind the app in Windows release builds.
 #![cfg_attr(all(windows, not(debug_assertions)), windows_subsystem = "windows")]
+
+#[expect(
+    dead_code,
+    reason = "the fake source and UI that use the bridge land in the next PR (#26 part 2)"
+)]
+mod bridge;
+mod scene;
 
 use bevy::prelude::*;
 
@@ -13,10 +22,6 @@ fn main() {
             }),
             ..default()
         }))
-        .add_systems(Startup, setup)
+        .add_plugins((bridge::BridgePlugin, scene::ScenePlugin))
         .run();
-}
-
-fn setup(mut commands: Commands) {
-    commands.spawn(Camera3d::default());
 }

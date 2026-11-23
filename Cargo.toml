@@ -10,6 +10,7 @@ publish = false
 
 [workspace.dependencies]
 bevy = "0.20.1"
+cc-core = { path = "crates/cc-core" }
 thiserror = "2"
 toml = "1.1"
 

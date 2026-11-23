@@ -2163,6 +2163,7 @@ name = "cc-viewer"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "cc-core",
 ]
 
 [[package]]
