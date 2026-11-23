@@ -22,7 +22,7 @@ crates/cc-pipeline  wires stages with channels, per-stage latency metrics (headl
 apps/viewer         Bevy app: 3D view, zone editor, alert panel
 ```
 
-Only `apps/viewer` exists today, on the workspace scaffold branch.
+Today `crates/cc-core` and `apps/viewer` exist. The viewer's internal structure is described in [VIEWER.md](VIEWER.md).
 
 ## Data flow
 

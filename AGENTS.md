@@ -10,8 +10,8 @@ Connected Care Wi-Fi 7 is a UCL COMP0016 team project with Intel. It is a Rust a
 
 **Current state:** early scaffold. The workspace contains only:
 
-- `apps/viewer` (package `cc-viewer`): a Bevy app that opens a window with a 3D camera.
-- `crates/cc-core`: an empty stub for the shared data contracts.
+- `apps/viewer` (package `cc-viewer`): the Bevy app, split into plugins with a pipeline bridge fed by a fake source (see `docs/VIEWER.md`).
+- `crates/cc-core`: the shared data contracts, plug-in traits and plug-in config loader.
 
 The rest of the crates in `docs/ARCHITECTURE.md` (`cc-sim`, `cc-dsp`, `cc-mapping`, `cc-alerts`, `cc-pipeline`) are planned, not built. Do not assume their types or APIs exist. The backlog lives in GitHub issues and the project board "Connected Care Wi-Fi 7".
 
