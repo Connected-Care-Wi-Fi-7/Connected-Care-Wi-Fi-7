@@ -83,7 +83,7 @@ These are hard requirements (FR-04 local edge processing, FR-05 privacy-first te
 - **Never commit or push to `main`.** Work on a branch named `type/short-name` (types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `ci`), created from an up-to-date `main`.
 - **Conventional Commits:** `type(scope): imperative description`, for example `feat(cc-dsp): add Hampel outlier filter`.
 - **Pull requests** target `main`, use `.github/pull_request_template.md`, and include `Closes #<issue>`. The link is required: it is how the area lead gets requested as reviewer.
-- Keep PRs under about 400 changed lines. Split bigger work into several issues and PRs.
+- No line limit on a PR, but one PR covers one issue. Keep each commit under about 200 changed lines so a large PR can be reviewed commit by commit. Unrelated changes go in separate PRs.
 - CI (`.github/workflows/ci.yml`) must be green. PRs are squash-merged.
 - Do not commit, push, open PRs, create issues or edit the project board unless the user asked you to.
 
