@@ -17,12 +17,24 @@ name: Lead approval
 # The result is one commit status named "Lead approval" on the head commit.
 # Every run (push or review) overwrites it, so an old failed run can never
 # leave a stale red check behind. The job itself always succeeds.
+#
+# Security: this workflow always runs the version on main, never the PR's copy.
+# - PR events use pull_request_target, which runs the base branch's workflow.
+# - Review events cannot use pull_request_target, so lead-approval-review.yml
+#   (no permissions, no steps that do anything) runs on pull_request_review and
+#   this workflow runs on its workflow_run, again from main. The workflow_run
+#   payload is untrusted: it is only used to find which PR to look up, and the
+#   result is recomputed from the GitHub API.
+# - PR code is never checked out or run here. Do not add actions/checkout.
+# A PR could still add another workflow that posts a "Lead approval" status,
+# so changes under .github/ need code-owner approval (see .github/CODEOWNERS).
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, synchronize, edited, labeled, unlabeled, ready_for_review]
-  pull_request_review:
-    types: [submitted, edited, dismissed]
+  workflow_run:
+    workflows: [Lead approval review trigger]
+    types: [completed]
 
 permissions:
   contents: read
@@ -30,19 +42,42 @@ permissions:
   pull-requests: read
   statuses: write
 
+# One group per head commit for both event types, so a review and a push
+# for the same commit do not race to write the status.
 concurrency:
-  group: lead-approval-${{ github.event.pull_request.number }}
+  group: lead-approval-${{ github.event.pull_request.head.sha || github.event.workflow_run.head_sha }}
   cancel-in-progress: true
 
 jobs:
   lead-approval:
     name: Check lead approval
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.event == 'pull_request_review' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v8
         with:
           script: |
-            const number = context.payload.pull_request.number;
+            // Which PR to check. For workflow_run the payload is untrusted and
+            // only picks the PR; everything below is read back from the API.
+            let number;
+            if (context.eventName === 'workflow_run') {
+              const runSha = context.payload.workflow_run.head_sha;
+              try {
+                const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  ...context.repo, commit_sha: runSha,
+                });
+                number = prs.find((p) => p.state === 'open' && p.head.sha === runSha)?.number;
+              } catch (e) {
+                core.warning(`Could not list PRs for ${runSha}: ${e.message}`);
+              }
+              number ??= context.payload.workflow_run.pull_requests?.[0]?.number;
+              if (!number) {
+                core.info(`No open PR found for ${runSha}; nothing to check.`);
+                return;
+              }
+            } else {
+              number = context.payload.pull_request.number;
+            }
             const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
             const author = pr.user.login.toLowerCase();
             const headSha = pr.head.sha;
