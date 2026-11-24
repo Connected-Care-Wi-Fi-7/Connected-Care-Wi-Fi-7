@@ -168,6 +168,85 @@ fn rejects_voxels_too_small_to_distinguish_at_the_grid_origin() {
     let space = single_axis_space(1e16, 8.0, 1.0);
     assert!(matches!(
         VoxelGrid::new(&space),
-        Err(VoxelGridError::InvalidDimensions { axis: 0 })
+        Err(VoxelGridError::InsufficientPrecision { axis: 0 })
+    ));
+}
+
+#[test]
+fn rejects_collapsed_interior_boundaries_at_large_origin() {
+    let mut space = single_axis_space((1_u64 << 53) as f64, 10.0, 1.25);
+    space.depth = 5.0;
+    space.height = 5.0;
+    assert!(matches!(
+        VoxelGrid::new(&space),
+        Err(VoxelGridError::InsufficientPrecision { axis: 0 })
+    ));
+}
+
+#[test]
+fn precision_guard_enforces_four_spacing_cutoff() {
+    // Around this origin the spacing between f64 values is two metres.
+    let origin = (1_u64 << 53) as f64;
+    let cutoff = 8.0_f64;
+    for voxel_size in [cutoff.next_down(), cutoff] {
+        let space = single_axis_space(origin, 32.0, voxel_size);
+        assert!(matches!(
+            VoxelGrid::new(&space),
+            Err(VoxelGridError::InsufficientPrecision { axis: 0 })
+        ));
+    }
+
+    let space = single_axis_space(origin, 32.0, cutoff.next_up());
+    let grid = VoxelGrid::new(&space).unwrap();
+    for x in 0..grid.occupancy().dimensions[0] {
+        let index = [x, 0, 0];
+        let centre = grid.voxel_to_world(index).unwrap();
+        assert_eq!(grid.world_to_voxel(centre).unwrap(), index);
+    }
+}
+
+#[test]
+fn precision_guard_accepts_small_voxels_at_practical_origins() {
+    for origin in [-10_000.0, 0.0, 10_000.0] {
+        let space = single_axis_space(origin, 0.1, 0.001);
+        let grid = VoxelGrid::new(&space).unwrap();
+        for x in 0..grid.occupancy().dimensions[0] {
+            let index = [x, 0, 0];
+            let centre = grid.voxel_to_world(index).unwrap();
+            assert_eq!(grid.world_to_voxel(centre).unwrap(), index);
+        }
+    }
+}
+
+#[test]
+fn round_trips_distinct_dimensions_on_all_three_axes() {
+    let mut space = config();
+    space.origin = [0.0; 3];
+    space.width = 3.0;
+    space.depth = 4.0;
+    space.height = 5.0;
+    space.voxel_size = 1.0;
+    space.access_points.clear();
+    let grid = VoxelGrid::new(&space).unwrap();
+    assert_eq!(grid.occupancy().dimensions, [3, 4, 5]);
+    let index = [1, 2, 3];
+    assert_eq!(grid.world_to_voxel([1.25, 2.25, 3.25]).unwrap(), index);
+    let centre = grid.voxel_to_world(index).unwrap();
+    assert_eq!(centre, [1.5, 2.5, 3.5]);
+    assert_eq!(grid.world_to_voxel(centre).unwrap(), index);
+}
+
+#[test]
+fn parsed_memory_override_reaches_grid_allocation_check() {
+    let required = 8 * std::mem::size_of::<OccupancyState>();
+    let text = format!(
+        "origin = [0.0, 0.0, 0.0]\nwidth = 1.0\ndepth = 1.0\nheight = 1.0\nvoxel_size = 0.5\naccess_points = []\nmax_grid_bytes = {}",
+        required - 1
+    );
+    let space = SpaceConfig::from_toml(&text).unwrap();
+    assert!(matches!(
+        VoxelGrid::new(&space),
+        Err(VoxelGridError::MemoryLimitExceeded { required_bytes, limit_bytes })
+            if required_bytes == required && limit_bytes == required - 1
     ));
 }

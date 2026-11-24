@@ -101,8 +101,9 @@ impl SpaceConfig {
 
     /// Checks dimensions and access points against the configured space.
     ///
-    /// Bounds are lower-inclusive and upper-exclusive on each axis. Since the
-    /// fields are public, callers must validate again after modifying them.
+    /// Access-point positions may lie on either boundary of each axis. Voxel
+    /// lookups remain upper-exclusive. Since the fields are public, callers
+    /// must validate again after modifying them.
     ///
     /// # Errors
     ///
@@ -141,7 +142,7 @@ impl SpaceConfig {
                 let coordinate = position[axis];
                 if !coordinate.is_finite()
                     || coordinate < self.origin[axis]
-                    || coordinate >= upper[axis]
+                    || coordinate > upper[axis]
                 {
                     return Err(SpaceConfigError::InvalidAccessPoint { index, axis });
                 }

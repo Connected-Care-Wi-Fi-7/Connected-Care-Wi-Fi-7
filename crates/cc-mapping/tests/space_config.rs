@@ -115,6 +115,18 @@ fn rejects_unrepresentable_upper_boundaries() {
 }
 
 #[test]
+fn accepts_access_points_on_upper_boundaries() {
+    let mut space = valid_space();
+    space.access_points = vec![
+        [7.0, 0.0, 1.0],
+        [3.0, 3.0, 1.0],
+        [3.0, 0.0, 2.5],
+        [7.0, 3.0, 2.5],
+    ];
+    assert_eq!(space.validate(), Ok(()));
+}
+
+#[test]
 fn rejects_outside_and_non_finite_access_points_on_each_axis() {
     for axis in 0..3 {
         let space = valid_space();
@@ -122,7 +134,7 @@ fn rejects_outside_and_non_finite_access_points_on_each_axis() {
         let lower = space.origin[axis];
         for value in [
             lower - 0.1,
-            lower + dimensions[axis],
+            lower + dimensions[axis] + 0.1,
             f64::NAN,
             f64::INFINITY,
         ] {

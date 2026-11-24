@@ -20,6 +20,12 @@ pub enum VoxelGridError {
         /// Axis index: 0 = x, 1 = y, 2 = z.
         axis: usize,
     },
+    /// The voxel size is too small relative to the coordinate precision.
+    #[error("voxel size is too small for reliable coordinates on axis {axis}")]
+    InsufficientPrecision {
+        /// Axis index: 0 = x, 1 = y, 2 = z.
+        axis: usize,
+    },
     /// The total number of cells cannot be represented or allocated.
     #[error("voxel grid is too large to allocate")]
     GridTooLarge,
@@ -51,8 +57,8 @@ impl VoxelGrid {
     /// Creates an initially unknown grid covering the configured space.
     ///
     /// # Errors
-    /// Returns an error for invalid configuration, unrepresentable dimensions
-    /// or a grid that cannot be allocated.
+    /// Returns an error for invalid configuration, unrepresentable dimensions,
+    /// insufficient coordinate precision, or a grid that cannot be allocated.
     pub fn new(config: &SpaceConfig) -> Result<Self, VoxelGridError> {
         config.validate()?;
         let extent = [config.width, config.depth, config.height];
@@ -70,6 +76,14 @@ impl VoxelGrid {
             }
             let origin = config.origin[axis];
             let upper = origin + extent[axis];
+            // Leave room for rounding in both offset multiplication and world
+            // coordinate arithmetic. This conservative bound may reject some
+            // representable grids, rather than silently collapsing cells.
+            let magnitude = origin.abs().max(upper.abs()).max(extent[axis]);
+            let spacing = magnitude.next_up() - magnitude;
+            if count > 1 && config.voxel_size <= 4.0 * spacing {
+                return Err(VoxelGridError::InsufficientPrecision { axis });
+            }
             if count > 1
                 && (origin + config.voxel_size <= origin || upper - config.voxel_size >= upper)
             {
