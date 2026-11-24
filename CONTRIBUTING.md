@@ -108,8 +108,25 @@ The project requires all processing to stay on the local machine (FR-04, local e
 
 - Do not write outbound network code. No HTTP clients, no telemetry, no update checks.
 - Any listener you add must bind to `127.0.0.1` only, never `0.0.0.0`.
-- Check every new dependency before adding it. It must not pull in network clients without a reason agreed in the issue. Dependencies will be checked by `cargo-deny` once it is set up in CI.
+- Check every new dependency before adding it. It must not pull in network clients without a reason agreed in the issue.
 - Hardware and sensors are chosen by a local config file, not by a remote service.
+
+CI enforces these rules with two jobs:
+
+- **`deny`** runs [`cargo-deny`](https://embarkstudios.github.io/cargo-deny/) with `deny.toml` over all features, so crates behind off-by-default hardware features are checked too. It fails on:
+  - a banned crate: HTTP clients, HTTP/QUIC stacks, WebSockets, TLS libraries and telemetry or crash reporting. Each ban in `deny.toml` gives its reason. MQTT clients are not banned yet; that needs a team decision.
+  - a licence outside the permissive list (MIT, MIT-0, Apache-2.0, BSD-2/3-Clause, ISC, Unicode-3.0, Zlib). No copyleft. If one crate needs another licence, add a per-crate `exceptions` entry with a reason instead of widening the list.
+  - a RustSec advisory (vulnerable, unmaintained or yanked crate). Ignore one only with an `ignore` entry and a reason.
+  - a dependency from anywhere other than crates.io.
+  Duplicate crate versions are only a warning, because Bevy pulls in several.
+- **`localhost-bind`** runs `scripts/check-localhost-bind` over tracked `.rs` and `.toml` files. It fails on any wildcard address (`0.0.0.0`, `[::]`, `Ipv4Addr::UNSPECIFIED` and similar) and on any IPv4 address other than `127.0.0.1` in a bind call or a `bind`/`listen` setting. A line that has to mention such an address, such as a test that checks it is rejected, can end with `// bind-check: allow`; reviewers should question every use. It is a text check, so addresses built at runtime are not seen and review still applies.
+
+To run both locally (install cargo-deny once with `cargo install --locked cargo-deny`):
+
+```
+cargo deny --all-features check
+scripts/check-localhost-bind
+```
 
 ## Privacy and data rules
 
