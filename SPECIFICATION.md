@@ -25,14 +25,11 @@
 
 ## Partner Organisation
 
-| Field | Value |
-| ----- | ----- |
-| Partner Organisation Name | Intel Capital |
-| Address of Partner Organisation | N/A |
+Intel, Intel Capital, IBM, Dell, HP
 
 ### Overview of Partner Organisation
 
-Add content here
+Primary partner is Intel Capital
 
 ### Partner Contacts
 
@@ -40,12 +37,13 @@ Add content here
 | ------------ | --------- | ----- | ------------ |
 | Phillippa Chick | N/A | <phillippa.chick@intel.com> | N/A |
 | Christian A. Buerger | N/A | <christian.a.buerger@intel.com> | N/A |
+| John McNamara | N/A | <j0nnymac@uk.ibm.com> | N/A |
 
 ### Communication and Meetings
 
 > How often the team meets the partner, through which channel (e.g., Teams, email, Slack), and who the main contact is on each side.
 
-Add content here
+As of 24/11/2026, we are having fortnightly Monday meetings, though this may change to weekly when the project picks up and we receive hardware. Contact with the partners is done by email, with meetings through Teams. Usually, Daniel Harrington (Team Lead) contacts Christian Buerger on behalf of the team to schedule meetings and share resources.
 
 ## Project Description
 
