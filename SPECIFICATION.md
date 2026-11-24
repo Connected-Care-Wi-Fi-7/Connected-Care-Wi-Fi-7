@@ -29,7 +29,7 @@ Intel, Intel Capital, IBM, Dell, HP
 
 ### Overview of Partner Organisation
 
-Primary partner is Intel Capital
+Professor Dean Mohamedally acts as the spokesperson and coordinator for all partners and has the final say in decisions.
 
 ### Partner Contacts
 
@@ -37,6 +37,7 @@ Primary partner is Intel Capital
 | ------------ | --------- | ----- | ------------ |
 | Christian A. Buerger | N/A | <christian.a.buerger@intel.com> | N/A |
 | John McNamara | N/A | <j0nnymac@uk.ibm.com> | N/A |
+| Dr. Atia Rafiq | N/A | <atia.rafiq@nhs.net> | N/A |
 
 ### Communication and Meetings
 
@@ -79,13 +80,13 @@ Unobserved patient falls in residential care facilities and geriatric wards repr
 Must Have Requirements (Critical Delivery):
 
 - **FR-01: Wi-Fi 7 CSI Data Capture Pipeline:** Implement a driver and telemetry ingestion service interfacing with Intel Wi-Fi 7 hardware to extract raw subcarrier Channel State Information (CSI) and amplitude/phase matrices.
+- **FR-10: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
 - **FR-02: Edge-Based Fall Detection Classifier:** Integrate a local machine learning classifier that identifies acute fall signatures, distinguishing rapid vertical descents from controlled reclining or sitting. The model is developed by an external collaborator; the team provides the integration interface and a stub threshold classifier to use until the model is ready.
 - **FR-03: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set recorded movements or designated 3D coordinate volumes as custom event triggers that dispatch alerts upon detection.
 - **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
 - **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
 - **FR-06: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
 - **FR-8: Caregiver Dashboard:** Deliver an intuitive dashboard inside the native desktop application displaying room occupancy heatmaps, trigger boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
-- **FR-10: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
 
 Should Have Requirements (High Priority):
 
@@ -107,7 +108,11 @@ Could Have Requirements:
 
 > Who will actually use the system (the partner's staff, customers, the public). Requirements, testing and ethics decisions all depend on this.
 
-Add content here
+There are two main areas for target users:
+- Family of an elderly person. The system's primary deployment aim is to monitor a vulnerable person within a domestic household.
+- Care home workers. The system's secondary deployment aim is monitor many residents of a care home.
+
+In order to understand the interests of these individuals, we will speak with our patner contacts, in particular Dr. Atia Rafiq, an NHS doctor.
 
 ## Out of Scope
 
