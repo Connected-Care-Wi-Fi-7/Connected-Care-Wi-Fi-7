@@ -1,22 +1,30 @@
 //! Pipeline bridge: moves `cc-core` output from pipeline threads into Bevy.
 //!
 //! A producer (today the fake source, later `cc-pipeline`) sends
-//! [`PipelineOutput`] values through a bounded channel. Once per Bevy frame,
-//! [`drain_pipeline`] takes everything waiting without blocking and exposes it
-//! as resources (latest state) and messages (every alert). Other plugins read
-//! only those, so they never deal with threads or channels.
+//! [`PipelineOutput`] values through two lanes:
+//!
+//! - **State** (occupancy and tracks) uses a bounded channel. Only the newest
+//!   value matters, so when it is full the update is dropped and counted.
+//! - **Alerts** use their own unbounded channel, so an alert is never dropped,
+//!   however busy the state lane is. Alerts are rare, so it stays small.
+//!
+//! Once per Bevy frame, [`drain_pipeline`] takes everything waiting without
+//! blocking and exposes it as resources (latest state) and messages (every
+//! alert). Other plugins read only those, so they never deal with threads or
+//! channels.
 
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::mpsc::{self, Receiver, SyncSender, TryRecvError, TrySendError};
+use std::sync::mpsc::{self, Receiver, Sender, SyncSender, TryRecvError, TrySendError};
 use std::sync::{Arc, Mutex};
 
 use bevy::prelude::*;
 use cc_core::{Alert, OccupancyFrame, Track};
 
-/// How many outputs the channel holds before the producer starts dropping.
+/// How many state updates the channel holds before the producer starts dropping.
 pub const CHANNEL_CAPACITY: usize = 256;
 
-/// Upper bound on outputs handled per Bevy frame, so a flood cannot stall rendering.
+/// Upper bound on items handled per lane per Bevy frame, so a flood cannot
+/// stall rendering. Anything left over waits for the next frame.
 const MAX_OUTPUTS_PER_FRAME: usize = 1024;
 
 /// One item of pipeline output, as delivered to the viewer.
@@ -26,14 +34,15 @@ pub enum PipelineOutput {
     Occupancy(OccupancyFrame),
     /// The current set of tracks, replacing the previous set.
     Tracks(Vec<Track>),
-    /// A new alert.
+    /// A new alert. Never dropped by the bridge.
     Alert(Alert),
 }
 
 /// Why a send to the viewer did not deliver its output.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SendError {
-    /// The channel was full, so the output was dropped and counted.
+    /// The state channel was full, so the update was dropped and counted.
+    /// Never returned for alerts.
     Full,
     /// The viewer has closed; the producer should stop.
     Disconnected,
@@ -42,19 +51,24 @@ pub enum SendError {
 /// Producer end of the bridge. Cheap to clone and safe to use from any thread.
 #[derive(Debug, Clone)]
 pub struct PipelineSender {
-    tx: SyncSender<PipelineOutput>,
+    state: SyncSender<PipelineOutput>,
+    alerts: Sender<Alert>,
     dropped: Arc<AtomicU64>,
 }
 
 impl PipelineSender {
-    /// Sends without blocking. A full channel drops the output and counts it.
+    /// Sends without blocking. Alerts always go through; a state update is
+    /// dropped and counted if the state channel is full.
     ///
     /// # Errors
     ///
-    /// Returns [`SendError::Full`] when the output was dropped, or
+    /// Returns [`SendError::Full`] when a state update was dropped, or
     /// [`SendError::Disconnected`] when the viewer has gone away.
     pub fn send(&self, output: PipelineOutput) -> Result<(), SendError> {
-        match self.tx.try_send(output) {
+        if let PipelineOutput::Alert(alert) = output {
+            return self.alerts.send(alert).map_err(|_| SendError::Disconnected);
+        }
+        match self.state.try_send(output) {
             Ok(()) => Ok(()),
             Err(TrySendError::Full(_)) => {
                 self.dropped.fetch_add(1, Ordering::Relaxed);
@@ -68,22 +82,27 @@ impl PipelineSender {
 /// Consumer end of the bridge, held by the Bevy app as a resource.
 #[derive(Resource)]
 pub struct PipelineReceiver {
-    // `Receiver` is not `Sync`; the mutex makes it usable as a resource.
-    rx: Mutex<Receiver<PipelineOutput>>,
+    // `Receiver` is not `Sync`; the mutexes make it usable as a resource.
+    state: Mutex<Receiver<PipelineOutput>>,
+    alerts: Mutex<Receiver<Alert>>,
     dropped: Arc<AtomicU64>,
 }
 
-/// Creates a connected sender and receiver with [`CHANNEL_CAPACITY`] slots.
+/// Creates a connected sender and receiver. The state lane has
+/// [`CHANNEL_CAPACITY`] slots; the alert lane is unbounded.
 pub fn channel() -> (PipelineSender, PipelineReceiver) {
-    let (tx, rx) = mpsc::sync_channel(CHANNEL_CAPACITY);
+    let (state_tx, state_rx) = mpsc::sync_channel(CHANNEL_CAPACITY);
+    let (alert_tx, alert_rx) = mpsc::channel();
     let dropped = Arc::new(AtomicU64::new(0));
     (
         PipelineSender {
-            tx,
+            state: state_tx,
+            alerts: alert_tx,
             dropped: Arc::clone(&dropped),
         },
         PipelineReceiver {
-            rx: Mutex::new(rx),
+            state: Mutex::new(state_rx),
+            alerts: Mutex::new(alert_rx),
             dropped,
         },
     )
@@ -104,9 +123,9 @@ pub struct AlertReceived(pub Alert);
 /// Counters describing the health of the bridge.
 #[derive(Resource, Debug, Default, Clone, PartialEq, Eq)]
 pub struct BridgeStats {
-    /// Outputs received from the pipeline since start-up.
+    /// Outputs (state updates and alerts) received since start-up.
     pub received: u64,
-    /// Outputs dropped because the channel was full.
+    /// State updates dropped because the channel was full. Alerts are never dropped.
     pub dropped: u64,
     /// Whether a producer is still attached.
     pub connected: bool,
@@ -141,19 +160,21 @@ pub fn drain_pipeline(
         return;
     };
     stats.dropped = receiver.dropped.load(Ordering::Relaxed);
-    let Ok(rx) = receiver.rx.lock() else {
-        // Only possible if a panic occurred while the lock was held.
+    let (Ok(state_rx), Ok(alert_rx)) = (receiver.state.lock(), receiver.alerts.lock()) else {
+        // Only possible if a panic occurred while a lock was held.
         stats.connected = false;
         return;
     };
-    stats.connected = true;
+    let mut connected = true;
+
     for _ in 0..MAX_OUTPUTS_PER_FRAME {
-        match rx.try_recv() {
+        match state_rx.try_recv() {
             Ok(output) => {
                 stats.received += 1;
                 match output {
                     PipelineOutput::Occupancy(frame) => occupancy.0 = Some(frame),
                     PipelineOutput::Tracks(latest) => tracks.0 = latest,
+                    // `send` routes alerts to their own lane; handle one here anyway.
                     PipelineOutput::Alert(alert) => {
                         alerts.write(AlertReceived(alert));
                     }
@@ -161,11 +182,27 @@ pub fn drain_pipeline(
             }
             Err(TryRecvError::Empty) => break,
             Err(TryRecvError::Disconnected) => {
-                stats.connected = false;
+                connected = false;
                 break;
             }
         }
     }
+
+    for _ in 0..MAX_OUTPUTS_PER_FRAME {
+        match alert_rx.try_recv() {
+            Ok(alert) => {
+                stats.received += 1;
+                alerts.write(AlertReceived(alert));
+            }
+            Err(TryRecvError::Empty) => break,
+            Err(TryRecvError::Disconnected) => {
+                connected = false;
+                break;
+            }
+        }
+    }
+
+    stats.connected = connected;
 }
 
 #[cfg(test)]
@@ -257,6 +294,28 @@ mod tests {
         drop(tx);
         app.update();
         assert!(!app.world().resource::<BridgeStats>().connected);
+    }
+
+    #[test]
+    fn alert_gets_through_when_state_channel_is_full() {
+        let (mut app, tx) = test_app();
+        for _ in 0..CHANNEL_CAPACITY {
+            tx.send(PipelineOutput::Tracks(vec![track(1)])).unwrap();
+        }
+        assert_eq!(
+            tx.send(PipelineOutput::Tracks(Vec::new())),
+            Err(SendError::Full),
+            "state channel should be full"
+        );
+        tx.send(PipelineOutput::Alert(alert(42))).unwrap();
+        app.update();
+
+        let messages = app.world().resource::<Messages<AlertReceived>>();
+        let received: Vec<_> = messages.iter_current_update_messages().collect();
+        assert_eq!(received.len(), 1);
+        assert_eq!(received[0].0.id, 42);
+        assert!(matches!(received[0].0.kind, AlertKind::PossibleFall));
+        assert_eq!(app.world().resource::<BridgeStats>().dropped, 1);
     }
 
     #[test]
