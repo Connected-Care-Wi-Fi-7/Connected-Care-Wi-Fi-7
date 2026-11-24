@@ -37,7 +37,8 @@ trap 'rm -f "$tmp"' EXIT
 list_files "$@" | while IFS= read -r file; do
     grep -nE "$wildcard" "$file" | grep -v "$allow" |
         sed "s|^|$file:|; s|\$|  <- wildcard address|"
-    grep -nE "$bind_ctx" "$file" | grep -v "$allow" |
+    # Lines already reported as wildcard are skipped so each is listed once.
+    grep -nE "$bind_ctx" "$file" | grep -v "$allow" | grep -vE "$wildcard" |
         while IFS= read -r line; do
             # Flag the line if any IPv4 literal on it is not 127.0.0.1.
             if printf '%s\n' "$line" | grep -oE "$ipv4" | grep -qvx '127\.0\.0\.1'; then
