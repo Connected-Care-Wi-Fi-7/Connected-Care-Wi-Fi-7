@@ -37,3 +37,20 @@ jobs:
       - run: cargo test --workspace
       - name: Test git hooks
         run: .githooks/test-hooks
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          arguments: --all-features
+
+  # Listeners must bind to 127.0.0.1 only (FR-04, CONTRIBUTING.md zero-cloud rules).
+  localhost-bind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: scripts/test-check-localhost-bind
+      - run: scripts/check-localhost-bind
