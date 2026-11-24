@@ -18,19 +18,18 @@ We will follow Conventional Commits 1.0.0 with two project rules: the scope is r
 
 We will limit each commit, not each PR, to 200 changed lines, excluding `Cargo.lock` and binary files, following Google's "Small CLs" guidance. A `Large-Commit: <reason>` trailer overrides the limit for scaffolding and generated files only. A PR covers one parent issue and may close its sub-issues. A PR title has no number; GitHub's squash merge appends `(#<PR>)`, so every commit on `main` ends in its PR number.
 
-We will enforce this with versioned git hooks in `.githooks/` (`commit-msg` for format and size, `pre-push` for fmt, clippy and test), written in plain `sh`, and with a CI workflow that checks the PR title and runs the hook tests.
+We will enforce this with versioned git hooks in `.githooks/` (`commit-msg` for format and size, `pre-push` for fmt, clippy and test), written in plain `sh`. CI runs the hook tests. The PR title, which becomes the commit on `main`, is checked by the reviewer.
 
 We will version releases with Semantic Versioning 2.0.0 and tag them `v<version>`. `CHANGELOG.md` follows Keep a Changelog 1.1.0 and is regenerated from `main` by git-cliff at each release; it is not edited by hand.
 
 ## Consequences
 
 - Review can go commit by commit, and a large PR no longer needs splitting into several PRs.
-- Every contributor must run `git config core.hooksPath .githooks` once per clone. Until they do, only CI catches mistakes, and CI checks the PR title, not each branch commit.
-- `--no-verify` skips the hooks. CI repeats the Rust checks and the title check, so what reaches `main` is still checked.
-- The changelog is only as good as the PR titles, because the squash commit subject becomes the changelog entry.
+- Every contributor must run `git config core.hooksPath .githooks` once per clone. Until they do, only CI and review catch mistakes.
+- `--no-verify` skips the hooks. CI repeats the Rust checks, so broken code still cannot reach `main`; commit format and size are then left to review.
+- The changelog is only as good as the PR titles, because the squash commit subject becomes the changelog entry. Nothing checks the title automatically, so reviewers must.
 - Contributors need git-cliff installed to cut a release; nobody needs it day to day.
 - The `pre-push` hook makes pushing slower, because clippy and the tests run first.
-- The CI title check is not yet a required status check. Making it required is a branch protection change for the repository admins.
 
 ## Alternatives considered
 
@@ -38,4 +37,5 @@ We will version releases with Semantic Versioning 2.0.0 and tag them `v<version>
 - **An environment variable to override the size limit.** It leaves no record. A trailer stays in history and is visible in review.
 - **Issue numbers in PR titles.** The squash merge would then produce `(#<issue>) (#<PR>)`. The PR already links its issues.
 - **A hand-written changelog.** It goes stale and duplicates information the commits already hold.
+- **A CI check of the PR title.** Rejected as unnecessary: the title is one line a reviewer can check, and GitHub lets it be fixed at merge time.
 - **Keeping the 400-line PR limit.** It splits a parent issue's work across PRs, and review happens commit by commit anyway.
