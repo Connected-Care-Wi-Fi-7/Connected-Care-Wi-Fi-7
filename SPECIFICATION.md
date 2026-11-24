@@ -134,7 +134,9 @@ Add content here
 
 > Identify any constraints on what can be done (e.g., time, technology, data access) and how risk can be mitigated (managed).
 
-Add content here
+Our project is very hardware dependent. We have planned development to achieve as much as possible without hardware by simulating CSI data initially, but there may come a point where lack hardware is a block on our project developing any further. This should mitigate the risk of limited time resulting in poor quality hardware development.
+
+Data and lab access may also pose a risk to our project as we will need to collect and simulate data ourselves in order to be able to test the system. This could involve having a test subject move around or fall over lab. To mitigate this, we will collect and store data so we can simulate and test our code without needing to have a live setup.
 
 ## Acceptance Criteria
 
