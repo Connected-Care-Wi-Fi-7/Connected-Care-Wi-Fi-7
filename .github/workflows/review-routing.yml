@@ -1,4 +1,4 @@
-name: PR reviewer
+name: Review / routing
 
 # Copies the area: label from the issue a PR closes and requests a review from
 # that area's lead (.github/area-leads.json). If the author is the lead, the

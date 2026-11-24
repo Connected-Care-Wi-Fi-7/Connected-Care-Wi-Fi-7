@@ -1,16 +1,16 @@
-name: Lead approval
+name: Review / lead approval
 
 # Required check on main. Passes only when the PR's lead reviewer has approved
 # the PR's current head commit, so every new push needs a fresh approval.
 #
 # The lead reviewer is picked per area: label with the same rule as
-# pr-reviewer.yml: the area lead, then the Team Lead if the author is the area
+# review-routing.yml: the area lead, then the Team Lead if the author is the area
 # lead, then the backup reviewer if the author is also the Team Lead. A PR with
 # several areas needs the lead reviewer of each. Other team members may review
 # and approve, but their approval does not satisfy this check.
 #
 # Areas come from the PR's area: labels and from the issues it closes, so the
-# check does not depend on pr-reviewer.yml having labelled the PR first. The
+# check does not depend on review-routing.yml having labelled the PR first. The
 # lead mapping is read from the base branch, so a PR cannot change who must
 # approve it.
 #
@@ -20,7 +20,7 @@ name: Lead approval
 #
 # Security: this workflow always runs the version on main, never the PR's copy.
 # - PR events use pull_request_target, which runs the base branch's workflow.
-# - Review events cannot use pull_request_target, so lead-approval-review.yml
+# - Review events cannot use pull_request_target, so review-approval-trigger.yml
 #   (no permissions, no steps that do anything) runs on pull_request_review and
 #   this workflow runs on its workflow_run, again from main. The workflow_run
 #   payload is untrusted: it is only used to find which PR to look up, and the
@@ -33,7 +33,7 @@ on:
   pull_request_target:
     types: [opened, reopened, synchronize, edited, labeled, unlabeled, ready_for_review]
   workflow_run:
-    workflows: [Lead approval review trigger]
+    workflows: ['Review / lead approval trigger']
     types: [completed]
 
 permissions:

@@ -8,7 +8,7 @@
 # Requiring the Platform & Integration lead or the Team Lead to approve every
 # change under .github/ closes that gap.
 #
-# Area leads are not listed. pr-reviewer.yml already requests them, and the
+# Area leads are not listed. review-routing.yml already requests them, and the
 # "Lead approval" check already requires their approval (see "How review
 # routing works" in docs/ROLES.md). Listing them here as well would make every
 # area lead a required reviewer of every file in their area, and a lead could
