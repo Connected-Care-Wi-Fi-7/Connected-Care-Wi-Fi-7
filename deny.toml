@@ -31,7 +31,12 @@ allow = [
     "Zlib",
 ]
 confidence-threshold = 0.8
-exceptions = []
+exceptions = [
+    # egui's bundled default fonts (ADR 0004). The fonts themselves are under
+    # font licences that allow bundling them with software of any licence; they
+    # place no obligations on our code.
+    { crate = "epaint_default_fonts", allow = ["OFL-1.1", "Ubuntu-font-1.0"] },
+]
 
 [licenses.private]
 # Our own workspace crates are `publish = false` and carry no licence field.
