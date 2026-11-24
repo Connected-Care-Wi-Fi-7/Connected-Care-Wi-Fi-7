@@ -1,0 +1,25 @@
+name: Review / lead approval trigger
+
+# Exists only so that a review re-runs the "Lead approval" check.
+#
+# pull_request_review runs the workflow file from the PR's branch, so a PR could
+# change this file. That is why it has no permissions and does nothing: the
+# check itself runs in review-approval.yml on workflow_run, from main, and reads
+# everything it needs from the GitHub API. If a PR breaks or removes this file,
+# reviews stop re-running the check and "Lead approval" stays failing until the
+# next push, so the check fails closed.
+#
+# review-approval.yml matches this workflow by name. Rename both together.
+
+on:
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+permissions: {}
+
+jobs:
+  trigger:
+    name: Trigger lead approval
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Review recorded; review-approval.yml re-checks the PR from main."

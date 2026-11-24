@@ -1,39 +1,20 @@
-# Area leads, as defined in docs/ROLES.md.
-# Keep in sync with .github/area-leads.json, which drives the review-routing workflows.
+# Code owners for main. "Require review from Code Owners" is on for main, so a
+# PR that changes a file listed here cannot merge without approval from one of
+# its owners (not the author).
 #
-# This file only requests reviews. It is not a required merge check: the
-# approval needed to merge comes from the "Lead approval" check, which wants
-# the PR's lead reviewer (see "How review routing works" in docs/ROLES.md).
-# Later lines win when several patterns match.
+# Only .github/ is listed. Workflows there can post commit statuses with the
+# same GitHub Actions identity that branch protection trusts, so a PR that adds
+# or edits a workflow could fake a required check such as "Lead approval".
+# Requiring the Platform & Integration lead or the Team Lead to approve every
+# change under .github/ closes that gap.
+#
+# Area leads are not listed. review-routing.yml already requests them, and the
+# "Lead approval" check already requires their approval (see "How review
+# routing works" in docs/ROLES.md). Listing them here as well would make every
+# area lead a required reviewer of every file in their area, and a lead could
+# not merge their own work in that area.
+#
+# Keep in sync with the Platform & Integration lead and the Team Lead in
+# .github/area-leads.json.
 
-# Platform & Integration
-/crates/cc-core/        @MatejPechoucek
-/crates/cc-pipeline/    @MatejPechoucek
-/.github/               @MatejPechoucek
-/Cargo.toml             @MatejPechoucek
-/rust-toolchain.toml    @MatejPechoucek
-/AGENTS.md              @MatejPechoucek
-/CLAUDE.md              @MatejPechoucek
-
-# Sensing & Simulation
-/crates/cc-sim/         @danielharrington06
-/crates/cc-driver-*/    @danielharrington06
-
-# Signal Processing
-/crates/cc-dsp/         @bendalton409
-
-# Spatial Mapping & Tracking
-/crates/cc-mapping/     @Dwheeler4
-
-# Dashboard & Alerts
-/apps/viewer/           @Magizh-Shankar
-/crates/cc-alerts/      @Magizh-Shankar
-
-# Project (routed by the Team Lead)
-/SPECIFICATION.md       @danielharrington06
-/README.md              @danielharrington06
-/CONTRIBUTING.md        @danielharrington06
-/docs/                  @danielharrington06
-
-# cc-core contract changes need an ADR reviewed by the Platform & Integration lead.
-/docs/adr/              @MatejPechoucek @danielharrington06
+/.github/   @MatejPechoucek @danielharrington06

@@ -1,28 +1,40 @@
-name: Lead approval
+name: Review / lead approval
 
 # Required check on main. Passes only when the PR's lead reviewer has approved
 # the PR's current head commit, so every new push needs a fresh approval.
 #
 # The lead reviewer is picked per area: label with the same rule as
-# pr-reviewer.yml: the area lead, then the Team Lead if the author is the area
+# review-routing.yml: the area lead, then the Team Lead if the author is the area
 # lead, then the backup reviewer if the author is also the Team Lead. A PR with
 # several areas needs the lead reviewer of each. Other team members may review
 # and approve, but their approval does not satisfy this check.
 #
 # Areas come from the PR's area: labels and from the issues it closes, so the
-# check does not depend on pr-reviewer.yml having labelled the PR first. The
+# check does not depend on review-routing.yml having labelled the PR first. The
 # lead mapping is read from the base branch, so a PR cannot change who must
 # approve it.
 #
 # The result is one commit status named "Lead approval" on the head commit.
 # Every run (push or review) overwrites it, so an old failed run can never
 # leave a stale red check behind. The job itself always succeeds.
+#
+# Security: this workflow always runs the version on main, never the PR's copy.
+# - PR events use pull_request_target, which runs the base branch's workflow.
+# - Review events cannot use pull_request_target, so review-approval-trigger.yml
+#   (no permissions, no steps that do anything) runs on pull_request_review and
+#   this workflow runs on its workflow_run, again from main. The workflow_run
+#   payload is untrusted: it is only used to find which PR to look up, and the
+#   result is recomputed from the GitHub API.
+# - PR code is never checked out or run here. Do not add actions/checkout.
+# A PR could still add another workflow that posts a "Lead approval" status,
+# so changes under .github/ need code-owner approval (see .github/CODEOWNERS).
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened, synchronize, edited, labeled, unlabeled, ready_for_review]
-  pull_request_review:
-    types: [submitted, edited, dismissed]
+  workflow_run:
+    workflows: ['Review / lead approval trigger']
+    types: [completed]
 
 permissions:
   contents: read
@@ -30,19 +42,42 @@ permissions:
   pull-requests: read
   statuses: write
 
+# One group per head commit for both event types, so a review and a push
+# for the same commit do not race to write the status.
 concurrency:
-  group: lead-approval-${{ github.event.pull_request.number }}
+  group: lead-approval-${{ github.event.pull_request.head.sha || github.event.workflow_run.head_sha }}
   cancel-in-progress: true
 
 jobs:
   lead-approval:
     name: Check lead approval
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.event == 'pull_request_review' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v8
         with:
           script: |
-            const number = context.payload.pull_request.number;
+            // Which PR to check. For workflow_run the payload is untrusted and
+            // only picks the PR; everything below is read back from the API.
+            let number;
+            if (context.eventName === 'workflow_run') {
+              const runSha = context.payload.workflow_run.head_sha;
+              try {
+                const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  ...context.repo, commit_sha: runSha,
+                });
+                number = prs.find((p) => p.state === 'open' && p.head.sha === runSha)?.number;
+              } catch (e) {
+                core.warning(`Could not list PRs for ${runSha}: ${e.message}`);
+              }
+              number ??= context.payload.workflow_run.pull_requests?.[0]?.number;
+              if (!number) {
+                core.info(`No open PR found for ${runSha}; nothing to check.`);
+                return;
+              }
+            } else {
+              number = context.payload.pull_request.number;
+            }
             const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
             const author = pr.user.login.toLowerCase();
             const headSha = pr.head.sha;
