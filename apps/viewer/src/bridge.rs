@@ -39,11 +39,11 @@ pub enum PipelineOutput {
 }
 
 /// Why a send to the viewer did not deliver its output.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum SendError {
-    /// The state channel was full, so the update was dropped and counted.
-    /// Never returned for alerts.
-    Full,
+    /// The state channel was full. The update was not delivered and is handed
+    /// back, so the producer can retry or discard it. Never returned for alerts.
+    Full(Box<PipelineOutput>),
     /// The viewer has closed; the producer should stop.
     Disconnected,
 }
@@ -58,11 +58,11 @@ pub struct PipelineSender {
 
 impl PipelineSender {
     /// Sends without blocking. Alerts always go through; a state update is
-    /// dropped and counted if the state channel is full.
+    /// counted as dropped and handed back if the state channel is full.
     ///
     /// # Errors
     ///
-    /// Returns [`SendError::Full`] when a state update was dropped, or
+    /// Returns [`SendError::Full`] with the undelivered update, or
     /// [`SendError::Disconnected`] when the viewer has gone away.
     pub fn send(&self, output: PipelineOutput) -> Result<(), SendError> {
         if let PipelineOutput::Alert(alert) = output {
@@ -70,9 +70,9 @@ impl PipelineSender {
         }
         match self.state.try_send(output) {
             Ok(()) => Ok(()),
-            Err(TrySendError::Full(_)) => {
+            Err(TrySendError::Full(output)) => {
                 self.dropped.fetch_add(1, Ordering::Relaxed);
-                Err(SendError::Full)
+                Err(SendError::Full(Box::new(output)))
             }
             Err(TrySendError::Disconnected(_)) => Err(SendError::Disconnected),
         }
@@ -272,15 +272,18 @@ mod tests {
     }
 
     #[test]
-    fn full_channel_drops_and_counts() {
+    fn full_channel_counts_and_hands_back_the_update() {
         let (mut app, tx) = test_app();
         for _ in 0..CHANNEL_CAPACITY {
             tx.send(PipelineOutput::Tracks(Vec::new())).unwrap();
         }
-        assert_eq!(
-            tx.send(PipelineOutput::Tracks(Vec::new())),
-            Err(SendError::Full)
-        );
+        let Err(SendError::Full(returned)) = tx.send(PipelineOutput::Tracks(vec![track(9)])) else {
+            panic!("a full channel should hand the update back");
+        };
+        let PipelineOutput::Tracks(returned) = *returned else {
+            panic!("the same update should come back");
+        };
+        assert_eq!(returned[0].id, 9);
         app.update();
 
         let stats = app.world().resource::<BridgeStats>();
@@ -302,9 +305,11 @@ mod tests {
         for _ in 0..CHANNEL_CAPACITY {
             tx.send(PipelineOutput::Tracks(vec![track(1)])).unwrap();
         }
-        assert_eq!(
-            tx.send(PipelineOutput::Tracks(Vec::new())),
-            Err(SendError::Full),
+        assert!(
+            matches!(
+                tx.send(PipelineOutput::Tracks(Vec::new())),
+                Err(SendError::Full(_))
+            ),
             "state channel should be full"
         );
         tx.send(PipelineOutput::Alert(alert(42))).unwrap();
@@ -333,9 +338,13 @@ mod tests {
     fn sending_after_viewer_closes_reports_disconnected() {
         let (tx, rx) = channel();
         drop(rx);
-        assert_eq!(
+        assert!(matches!(
             tx.send(PipelineOutput::Tracks(Vec::new())),
             Err(SendError::Disconnected)
-        );
+        ));
+        assert!(matches!(
+            tx.send(PipelineOutput::Alert(alert(1))),
+            Err(SendError::Disconnected)
+        ));
     }
 }
