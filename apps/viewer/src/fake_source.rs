@@ -50,9 +50,19 @@ fn run(tx: &PipelineSender) {
     let period = Duration::from_nanos(1_000_000_000 / FRAME_RATE_HZ);
     for tick in 0.. {
         for output in frame_outputs(tick) {
-            // A full channel just drops this output; the bridge counts it.
-            if tx.send(output) == Err(SendError::Disconnected) {
-                return;
+            match tx.send(output) {
+                Ok(()) => {}
+                Err(SendError::Disconnected) => return,
+                // The next tick sends a newer update, so a refused one is skipped.
+                // Alerts are never refused.
+                Err(SendError::Full(skipped)) => {
+                    let kind = match *skipped {
+                        PipelineOutput::Occupancy(_) => "occupancy",
+                        PipelineOutput::Tracks(_) => "tracks",
+                        PipelineOutput::Alert(_) => "alert",
+                    };
+                    debug!("state channel full; skipped a {kind} update");
+                }
             }
         }
         thread::sleep(period);
