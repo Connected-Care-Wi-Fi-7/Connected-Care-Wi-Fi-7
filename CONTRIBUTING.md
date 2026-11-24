@@ -20,7 +20,7 @@ This guide explains how the team works on Connected Care Wi-Fi 7. Read it before
 6. **CI must be green** before merging.
 7. **Squash merge.** The squashed commit message must also follow Conventional Commits.
 
-Keep pull requests small, under roughly 400 changed lines. If a change is larger, split it into several issues and several PRs. Small PRs are reviewed faster and are easier to revert.
+There is no line limit on a pull request, but keep each one about a single issue. Keep each commit small and focused, under roughly 200 changed lines, so a reviewer can read a large PR one commit at a time. Unrelated changes go in separate PRs.
 
 Never push directly to `main`.
 
