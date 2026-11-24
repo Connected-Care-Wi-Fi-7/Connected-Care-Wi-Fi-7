@@ -1,0 +1,66 @@
+#!/bin/sh
+# Tests check-subject and commit-msg against sample messages in a throwaway
+# repository. Run from anywhere: .githooks/test-hooks
+
+hooks=$(cd "$(dirname "$0")" && pwd)
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+failures=0
+
+expect() { # expect pass|fail <description> <command...>
+    want=$1 desc=$2
+    shift 2
+    if "$@" >/dev/null 2>&1; then got=pass; else got=fail; fi
+    if [ "$got" = "$want" ]; then
+        echo "ok   $desc"
+    else
+        echo "FAIL $desc (wanted $want, got $got)"
+        failures=$((failures + 1))
+    fi
+}
+
+subject() { "$hooks/check-subject" "$@"; }
+
+expect pass "commit: valid subject" subject "feat(cc-dsp): add Hampel filter (#12)"
+expect pass "commit: nested scope" subject "fix(cc-core/config): reject empty path (#3)"
+expect fail "commit: missing issue" subject "feat(cc-dsp): add Hampel filter"
+expect fail "commit: missing scope" subject "feat: add Hampel filter (#12)"
+expect fail "commit: unknown type" subject "feature(cc-dsp): add filter (#12)"
+expect fail "commit: uppercase scope" subject "feat(DSP): add filter (#12)"
+expect fail "commit: breaking marker" subject "feat(cc-dsp)!: add filter (#12)"
+expect fail "commit: no space after colon" subject "feat(cc-dsp):add filter (#12)"
+expect pass "commit: git merge" subject "Merge branch 'main' into feat/x"
+expect pass "commit: git revert" subject 'Revert "feat(x): y (#1)"'
+expect pass "commit: fixup" subject "fixup! feat(x): y (#1)"
+
+# commit-msg needs a repository with staged changes.
+git init -q "$tmp/repo"
+cd "$tmp/repo" || exit 1
+msg() { printf '%b' "$1" >"$tmp/msg" && "$hooks/commit-msg" "$tmp/msg"; }
+lines() { i=0; while [ "$i" -lt "$2" ]; do echo "line $i"; i=$((i + 1)); done >"$1"; }
+
+lines small.txt 50
+git add small.txt
+expect pass "msg: subject only" msg "docs(readme): fix typo (#1)\n"
+expect pass "msg: body and footer" msg "docs(readme): fix typo (#1)\n\nWhy it matters.\n\nRefs: #2\n"
+expect pass "msg: git comments ignored" msg "docs(readme): fix typo (#1)\n# Please enter the commit message\n"
+expect fail "msg: no blank line before body" msg "docs(readme): fix typo (#1)\nbody\n"
+expect fail "msg: bad subject" msg "fixed stuff\n"
+
+lines big.txt 250
+git add big.txt
+expect fail "msg: 300 lines over limit" msg "feat(x): add big file (#1)\n"
+expect pass "msg: Large-Commit trailer" msg "feat(x): add big file (#1)\n\nLarge-Commit: initial scaffold\n"
+expect fail "msg: empty Large-Commit" msg "feat(x): add big file (#1)\n\nLarge-Commit:\n"
+expect pass "msg: merge skips size" msg "Merge branch 'main' into feat/x\n"
+
+git rm -q --cached big.txt
+lines Cargo.lock 500
+git add Cargo.lock
+expect pass "msg: Cargo.lock not counted" msg "chore(deps): bump lockfile (#1)\n"
+
+if [ "$failures" -ne 0 ]; then
+    echo "$failures test(s) failed"
+    exit 1
+fi
+echo "all hook tests passed"

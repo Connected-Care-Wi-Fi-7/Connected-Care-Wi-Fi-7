@@ -1,0 +1,28 @@
+#!/bin/sh
+# Checks one commit subject against the project's commit convention
+# (see "Commits" in CONTRIBUTING.md). Called by .githooks/commit-msg.
+#
+# Usage: check-subject "<subject>"
+
+types='feat|fix|perf|docs|chore|refactor|test|ci'
+scope='[a-z0-9][a-z0-9._/-]*'
+head="^($types)\\($scope\\): [^ ]"
+
+subject=$1
+
+fail() {
+    echo "error: $1" >&2
+    echo "  got:      $subject" >&2
+    echo "  expected: $2" >&2
+    echo "  types:    $(echo "$types" | tr '|' ' ')" >&2
+    exit 1
+}
+
+# Messages git writes itself pass unchecked; squash merge replaces them.
+case "$subject" in
+'Merge '* | 'Revert "'* | 'fixup! '* | 'squash! '* | 'amend! '*) exit 0 ;;
+esac
+
+echo "$subject" | grep -Eq "$head.* \\(#[0-9]+\\)\$" ||
+    fail "commit subject does not match the convention" \
+        "type(scope): description (#<issue>)"
