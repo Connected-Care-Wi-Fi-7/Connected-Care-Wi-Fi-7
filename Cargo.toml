@@ -10,6 +10,8 @@ publish = false
 
 [workspace.dependencies]
 bevy = "0.20.1"
+# Clipboard and open-URL features are off: the viewer needs neither (zero-cloud).
+bevy_egui = { version = "0.43.1", default-features = false, features = ["render", "default_fonts", "picking"] }
 cc-core = { path = "crates/cc-core" }
 thiserror = "2"
 toml = "1.1"

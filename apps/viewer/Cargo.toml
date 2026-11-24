@@ -7,4 +7,5 @@ publish.workspace = true
 
 [dependencies]
 bevy.workspace = true
+bevy_egui.workspace = true
 cc-core.workspace = true
