@@ -10,23 +10,61 @@ This guide explains how the team works on Connected Care Wi-Fi 7. Read it before
    - `fix/voxel-grid-off-by-one`
    - `docs/update-requirements`
    - `chore/project-standards`
-3. **Commit with Conventional Commits.** The format is `type: short description` or `type(scope): short description`, in the imperative mood. Examples:
-   - `feat(cc-dsp): add Hampel outlier filter`
-   - `fix(cc-sim): keep frame timestamps monotonic`
-   - `docs: describe the replay file format`
-   - `ci: pin the Rust toolchain`
-4. **Open a pull request** against `main`. Fill in the template and put `Closes #<issue number>` under "Linked issue" so the issue closes when the PR merges.
+3. **Commit** in small steps, following "Commits" below. The hooks in `.githooks/` check every commit (see "Local checks").
+4. **Open a pull request** against `main`. Fill in the template. The title follows "Commits" below but without a number, for example `feat(cc-dsp): add Hampel outlier filter`; CI checks it. A PR covers one parent issue and may also close that issue's sub-issues. Put one `Closes #<number>` line per issue under "Linked issue", because closing a parent issue does not close its sub-issues. Unrelated changes go in separate PRs. There is no line limit on a PR.
 5. **Review.** The PR's lead reviewer must approve it: the lead of the linked issue's area, or the Team Lead if you are that lead, or the backup reviewer if you are also the Team Lead. They are requested automatically (see "How review routing works" in `docs/ROLES.md`). Anyone else may review too. Every new push needs a fresh approval, every "Request changes" review must be resolved and every conversation resolved before merging. These rules apply to everyone, admins included. Reviewers check the Definition of Done below.
 6. **CI must be green** before merging.
-7. **Squash merge.** The squashed commit message must also follow Conventional Commits.
-
-There is no line limit on a pull request, but keep each one about a single issue. Keep each commit small and focused, under roughly 200 changed lines, so a reviewer can read a large PR one commit at a time. Unrelated changes go in separate PRs.
+7. **Squash merge.** Keep the PR title as the commit subject. GitHub appends the PR number, so every commit on `main` reads `type(scope): description (#<PR>)`, and the PR links to its issues.
 
 Never push directly to `main`.
 
+## Commits
+
+We follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) with two project rules: the scope is required, and the subject ends in the issue number. The format is:
+
+```
+type(scope): description (#<issue>)
+
+optional body
+
+optional footer
+```
+
+- **type** is one of `feat`, `fix`, `perf`, `docs`, `chore`, `refactor`, `test`, `ci`.
+- **scope** is one lower-case area, usually a crate or folder, for example `cc-dsp`, `viewer`, `agents` or `github`. One scope per commit: work in two areas is two commits.
+- **description** is in the imperative mood: "add", not "added".
+- Leave a blank line before the body. The body explains why, not what.
+- Examples:
+  - `feat(cc-dsp): add Hampel outlier filter (#12)`
+  - `fix(cc-sim): keep frame timestamps monotonic (#20)`
+  - `docs(adr): record the replay file format (#31)`
+
+Messages git writes itself (`Merge ...`, `Revert "..."`, `fixup!`, `squash!`) are accepted as they are; the squash merge replaces them.
+
+**Size.** Keep each commit under 200 changed lines (added plus deleted), so a large PR can be reviewed one commit at a time. `Cargo.lock` and binary files are not counted. This follows Google's [Small CLs](https://google.github.io/eng-practices/review/developer/small-cls.html) guidance. Only for scaffolding or generated files that cannot be split, add a trailer as the last line of the message saying why:
+
+```
+chore(viewer): scaffold the Bevy app (#7)
+
+Large-Commit: generated project template
+```
+
+Reviewers should question any `Large-Commit` that is not scaffolding or generated output.
+
 ## Local checks
 
-Run these three commands before you push. CI runs the first two today; `cargo test` joins CI once the Cargo workspace is on `main`.
+Turn on the project's git hooks once per clone:
+
+```
+git config core.hooksPath .githooks
+```
+
+- `commit-msg` checks the commit format and size rules in "Commits".
+- `pre-push` runs the three CI checks below and stops the push if one fails.
+
+The hooks are plain `sh` scripts with no extra dependencies, and work on macOS, Linux and Git Bash on Windows. `--no-verify` skips them, but CI runs the same checks, so only use it when you know CI will catch the problem anyway. After changing a hook, run `.githooks/test-hooks`.
+
+The pre-push checks, which CI also runs:
 
 ```
 cargo fmt --all -- --check
@@ -89,7 +127,7 @@ AI tools may be used. The person who submits the work is its author and is respo
 - AI tools never contribute under their own GitHub account. Every commit, issue, pull request and comment comes from a team member's account.
 - Do not add `Co-Authored-By` trailers for AI tools to commits, and do not add promotional "Generated with ..." footers to pull requests.
 - Do not add links to AI tool sessions or chat threads, or hidden attribution comments, to commits, issues, pull requests or comments.
-- A short, plain one-line disclosure is allowed in an issue or pull request description, for example "The fix was handed off to Claude and reviewed by me."
+- Every issue and pull request that an AI tool drafted, in whole or in part, must end with a short, plain one-line disclosure, for example "This was drafted by Claude and reviewed by me before being submitted."
 - This does not replace any declaration the module requires for assessed work. Follow the module's own rules on declaring AI use.
 
 ## Labels
@@ -134,5 +172,20 @@ Write an ADR when you change a `cc-core` contract, choose between libraries or m
 
 ## Releases
 
-- Tag the `main` branch at the end of each milestone, for example `m1-walking-skeleton`.
-- Keep a `CHANGELOG.md` at the repository root. Add the notable changes for each milestone when you tag it.
+Versions follow [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html). While the version is `0.x`, each milestone release bumps the minor version (`0.1.0`, `0.2.0`) and a fix between milestones bumps the patch version (`0.2.1`). Tags are `v<version>`, for example `v0.2.0`.
+
+`CHANGELOG.md` follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and is generated from the commits on `main` by [git-cliff](https://git-cliff.org) using `cliff.toml`. `feat` commits go under "Added", `perf` under "Changed" and `fix` under "Fixed"; other types are left out. Do not edit `CHANGELOG.md` by hand: the next release regenerates it, so fix a bad entry by writing better PR titles. Install git-cliff with `brew install git-cliff` or `cargo install git-cliff`.
+
+To release:
+
+1. Create a release issue and a branch `chore/release-v<version>` from an up-to-date `main`.
+2. Set `version` under `[workspace.package]` in `Cargo.toml`.
+3. Run `git cliff --tag v<version> -o CHANGELOG.md`.
+4. Open a PR titled `chore(release): v<version>` and merge it.
+5. Tag the merge commit and push the tag:
+
+   ```
+   git checkout main && git pull
+   git tag -a v<version> -m "v<version>"
+   git push origin v<version>
+   ```
