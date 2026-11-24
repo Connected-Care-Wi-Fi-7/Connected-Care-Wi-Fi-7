@@ -35,7 +35,6 @@ Primary partner is Intel Capital
 
 | Contact Name | Job Title | Email | Phone Number |
 | ------------ | --------- | ----- | ------------ |
-| Phillippa Chick | N/A | <phillippa.chick@intel.com> | N/A |
 | Christian A. Buerger | N/A | <christian.a.buerger@intel.com> | N/A |
 | John McNamara | N/A | <j0nnymac@uk.ibm.com> | N/A |
 
@@ -66,9 +65,10 @@ Unobserved patient falls in residential care facilities and geriatric wards repr
 
 > Key dates, interim deliverables and partner demo points.
 
-- **Phase 1: Wi-Fi 7 CSI Ingestion & Testbed Setup (Oct – Nov 2026), Weeks 1 – 4:** Configure Intel Wi-Fi 7 testbed with final year student; implement CSI extraction driver; benchmark baseline packet availability and noise floors.
-- **Phase 2: Signal Filtering & 3D Mapping Core (Nov – Dec 2026), Weeks 5 – 8:** Build phase unwrapping and wavelet filters; reconstruct 3D occupancy voxel grid; integrate the fall-classifier interface with a stub classifier.
-- **Phase 3: Trigger Automation & Feasibility Benchmarking (Jan – Feb 2027), Weeks 9 – 12:** Implement user-defined spatial alert triggers; test false-positive rejection; evaluate network throughput trade-offs; author technical evaluation.
+- **Milestone 0: Foundations:** Workspace merged with contracts and traits agreed, CI green with tests
+- **Milestone 1: Walking Skeleton:** Simulated scene flows end to end into the Bevy app using fakes and a scripted fall raises an alert, ready to demo for Dell on 8/12/26
+- **Milestone 2: Real Algorithms on Simulated Data:** Fakes replaced by real DSP, mapping, tracking with acceptance numbers measured on simulator
+- **Milestone 3: Hardware Integration and Client Evaluation:** BE200 source plugged in once hardware arrives and evaluation report drafted from discussion with clients
 - **Hard Deadline 1: Software Delivery, Friday, 12 March 2027:** Full Software Code Delivery: Feature-frozen CSI pipeline, 3D visualizer, fall detection model integration, alert manager, test suites, and documentation.
 - **Hard Deadline 2: Website & Video Delivery, Tuesday, 16 March 2027:** Public IXN Website & Video: Complete project website, technical architecture walkthrough, demonstrator showcase video, and research report.
 
