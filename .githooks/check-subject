@@ -1,0 +1,53 @@
+#!/bin/sh
+# Checks one commit subject or pull request title against the project's
+# commit convention (see "Commits" in CONTRIBUTING.md).
+#
+# Usage: check-subject commit "<subject>"   # branch commit, needs "(#<issue>)"
+#        check-subject pr "<title>"         # PR title, no number: GitHub's
+#                                           # squash merge appends "(#<PR>)"
+#
+# Used by .githooks/commit-msg and by the PR title check in CI, so the rule
+# lives in one place.
+
+types='feat|fix|perf|docs|chore|refactor|test|ci'
+scope='[a-z0-9][a-z0-9._/-]*'
+head="^($types)\\($scope\\): [^ ]"
+
+mode=$1
+subject=$2
+
+fail() {
+    echo "error: $1" >&2
+    echo "  got:      $subject" >&2
+    echo "  expected: $2" >&2
+    echo "  types:    $(echo "$types" | tr '|' ' ')" >&2
+    exit 1
+}
+
+case "$mode" in
+commit)
+    # Messages git writes itself pass unchecked; squash merge replaces them.
+    case "$subject" in
+    'Merge '* | 'Revert "'* | 'fixup! '* | 'squash! '* | 'amend! '*) exit 0 ;;
+    esac
+    echo "$subject" | grep -Eq "$head.* \\(#[0-9]+\\)\$" ||
+        fail "commit subject does not match the convention" \
+            "type(scope): description (#<issue>)"
+    ;;
+pr)
+    case "$subject" in
+    'Revert "'*) exit 0 ;;
+    esac
+    echo "$subject" | grep -Eq "$head" ||
+        fail "PR title does not match the convention" \
+            "type(scope): description"
+    if echo "$subject" | grep -Eq '\(#[0-9]+\) *$'; then
+        fail "PR title must not end in a number; GitHub appends (#<PR>) on squash merge" \
+            "type(scope): description"
+    fi
+    ;;
+*)
+    echo "usage: check-subject commit|pr <subject>" >&2
+    exit 2
+    ;;
+esac

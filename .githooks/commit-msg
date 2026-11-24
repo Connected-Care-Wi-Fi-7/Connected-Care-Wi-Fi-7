@@ -1,0 +1,40 @@
+#!/bin/sh
+# Rejects a commit whose message breaks the convention or whose staged change
+# is over the size limit. See "Commits" in CONTRIBUTING.md.
+# Enable once per clone: git config core.hooksPath .githooks
+
+limit=200
+hooks_dir=$(dirname "$0")
+
+# Drop the diff that "git commit -v" appends, then git's comment lines.
+msg=$(sed '/^# -* >8 -*$/,$d' "$1" | git stripspace --strip-comments)
+subject=$(printf '%s\n' "$msg" | sed -n 1p)
+second=$(printf '%s\n' "$msg" | sed -n 2p)
+
+[ -n "$subject" ] || exit 0 # empty message: git aborts the commit itself
+
+"$hooks_dir/check-subject" commit "$subject" || exit 1
+
+if [ -n "$second" ]; then
+    echo "error: leave a blank line between the subject and the body" >&2
+    exit 1
+fi
+
+# Merge commits only bring in work that was already checked.
+case "$subject" in 'Merge '*) exit 0 ;; esac
+
+if printf '%s\n' "$msg" | grep -Eq '^Large-Commit: *[^ ]'; then
+    exit 0
+fi
+
+# Added plus deleted lines, skipping binary files (shown as "-") and Cargo.lock.
+changed=$(git diff --cached --numstat -M |
+    awk '$1 != "-" && $3 !~ /(^|\/)Cargo\.lock$/ { n += $1 + $2 } END { print n + 0 }')
+
+if [ "$changed" -gt "$limit" ]; then
+    echo "error: this commit changes $changed lines; the limit is $limit" >&2
+    echo "  Split it into smaller commits. Only for scaffolding or generated files," >&2
+    echo "  add a trailer to the message explaining why:" >&2
+    echo "    Large-Commit: <reason>" >&2
+    exit 1
+fi
