@@ -16,15 +16,17 @@ The viewer (`apps/viewer`, package `cc-viewer`) is the Bevy desktop app. It is s
 ## How data reaches the app
 
 ```
-pipeline thread                         Bevy app (one pass per rendered frame)
-PipelineSender --[bounded channel]--> drain_pipeline --> LatestOccupancy, LatestTracks  (resources)
-                                                     --> AlertReceived                  (message per alert)
-                                                     --> BridgeStats                    (received, dropped, connected)
+pipeline thread                                Bevy app (one pass per rendered frame)
+PipelineSender --[state: bounded channel]--+--> drain_pipeline --> LatestOccupancy, LatestTracks  (resources)
+               --[alerts: own channel]-----+                   --> AlertReceived                  (message per alert)
+                                                               --> BridgeStats                    (received, dropped, connected)
 ```
 
-- The producer runs on its own thread and calls `PipelineSender::send`, which never blocks. If the channel is full, the output is dropped and counted in `BridgeStats::dropped`.
+- The producer runs on its own thread and calls `PipelineSender::send`, which never blocks. It sends on two lanes:
+  - **State** (occupancy and tracks) uses a bounded channel. If it is full, the update is counted in `BridgeStats::dropped` and handed back in `SendError::Full`, so the producer can retry or let it go.
+  - **Alerts** use their own unbounded channel, so a busy state lane can never push an alert out.
 - `drain_pipeline` runs in `PreUpdate`, takes everything waiting without blocking, and updates the resources and messages above before other systems run.
-- Occupancy and tracks keep only the latest value. Every alert is delivered as an `AlertReceived` message, so none are lost between frames.
+- Occupancy and tracks keep only the latest value. Every alert is delivered as an `AlertReceived` message: alerts are never dropped by the bridge, and if more arrive than one frame handles, the rest wait for the next frame.
 - Other plugins read only these resources and messages. They do not know about threads or channels.
 
 ## Adding a feature
