@@ -1,0 +1,55 @@
+#!/bin/sh
+# Fails if Rust or TOML files bind a listener to anything other than
+# 127.0.0.1 (FR-04 local edge processing; CONTRIBUTING.md zero-cloud rules).
+#
+# Usage: scripts/check-localhost-bind [file-or-dir...]
+# With no arguments it checks every tracked *.rs and *.toml file.
+#
+# Two rules:
+#   1. Wildcard addresses are never allowed: 0.0.0.0, [::], "::",
+#      Ipv4Addr::UNSPECIFIED, Ipv6Addr::UNSPECIFIED, INADDR_ANY.
+#   2. A bind call or bind/listen setting (`bind(`, `bind = `,
+#      `listen_addr = ` ...) may only use the IPv4 literal 127.0.0.1.
+#
+# A line that must mention such an address (for example a test that checks
+# a wildcard address is rejected) can end with the comment
+# `bind-check: allow`. Reviewers should question every use of it.
+#
+# This is a text check, not a proof: an address built at runtime or passed
+# through a variable is not seen. Review still applies.
+
+wildcard='0\.0\.0\.0|\[::\]|"::|Ipv4Addr::UNSPECIFIED|Ipv6Addr::UNSPECIFIED|INADDR_ANY|IN6ADDR_ANY'
+bind_ctx='bind\(|(bind|listen)[A-Za-z_]*[[:space:]]*='
+ipv4='([0-9]{1,3}\.){3}[0-9]{1,3}'
+allow='bind-check: allow'
+
+list_files() {
+    if [ "$#" -eq 0 ]; then
+        git ls-files -- '*.rs' '*.toml'
+    else
+        find "$@" -type f \( -name '*.rs' -o -name '*.toml' \)
+    fi
+}
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+
+list_files "$@" | while IFS= read -r file; do
+    grep -nE "$wildcard" "$file" | grep -v "$allow" |
+        sed "s|^|$file:|; s|\$|  <- wildcard address|"
+    grep -nE "$bind_ctx" "$file" | grep -v "$allow" |
+        while IFS= read -r line; do
+            # Flag the line if any IPv4 literal on it is not 127.0.0.1.
+            if printf '%s\n' "$line" | grep -oE "$ipv4" | grep -qvx '127\.0\.0\.1'; then
+                printf '%s:%s  <- binds to a non-loopback address\n' "$file" "$line"
+            fi
+        done
+done >"$tmp"
+
+if [ -s "$tmp" ]; then
+    cat "$tmp"
+    echo
+    echo "Listeners must bind to 127.0.0.1 only (CONTRIBUTING.md, Zero-cloud rules)."
+    exit 1
+fi
+echo "bind check: ok"

@@ -1,0 +1,59 @@
+#!/bin/sh
+# Tests check-localhost-bind against sample files in a throwaway directory.
+# Run from anywhere: scripts/test-check-localhost-bind
+
+scripts=$(cd "$(dirname "$0")" && pwd)
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+failures=0
+n=0
+
+expect() { # expect pass|fail <description> <file contents> [extension]
+    want=$1 desc=$2 body=$3 ext=${4:-rs}
+    n=$((n + 1))
+    dir="$tmp/case$n"
+    mkdir -p "$dir"
+    printf '%s\n' "$body" >"$dir/sample.$ext"
+    if "$scripts/check-localhost-bind" "$dir" >/dev/null 2>&1; then got=pass; else got=fail; fi
+    if [ "$got" = "$want" ]; then
+        echo "ok   $desc"
+    else
+        echo "FAIL $desc (wanted $want, got $got)"
+        failures=$((failures + 1))
+    fi
+}
+
+expect pass "loopback TcpListener" 'let l = TcpListener::bind("127.0.0.1:7878")?;'
+expect pass "loopback UdpSocket" 'let s = UdpSocket::bind(("127.0.0.1", 0))?;'
+expect pass "no network code" 'fn main() { println!("1.2.3.4"); }'
+expect pass "version-like literal outside bind" 'const V: &str = "0.1.2.3";'
+expect fail "wildcard IPv4 in bind" 'let l = TcpListener::bind("0.0.0.0:7878")?;'
+expect fail "wildcard IPv4 in a variable" 'let addr = "0.0.0.0:7878";'
+expect fail "wildcard IPv6 brackets" 'let l = TcpListener::bind("[::]:7878")?;'
+expect fail "wildcard IPv6 bare" 'let l = TcpListener::bind(("::", 7878))?;'
+expect fail "Ipv4Addr::UNSPECIFIED" 'let a = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 80));'
+expect fail "Ipv6Addr::UNSPECIFIED" 'let a = SocketAddr::from((Ipv6Addr::UNSPECIFIED, 80));'
+expect fail "LAN address in bind" 'let l = TcpListener::bind("192.168.1.20:7878")?;'
+expect fail "mixed loopback and LAN in bind" 'bind(["127.0.0.1:1", "10.0.0.5:2"]);'
+expect pass "allow marker" 'assert!(parse("0.0.0.0:1").is_err()); // bind-check: allow'
+expect pass "loopback in TOML" 'bind = "127.0.0.1:7878"' toml
+expect fail "wildcard in TOML" 'bind = "0.0.0.0:7878"' toml
+expect fail "LAN listen address in TOML" 'listen_addr = "10.1.2.3:1883"' toml
+expect pass "other file types ignored" 'bind = "0.0.0.0:7878"' md
+
+# A clean file and a bad file together must still fail.
+mkdir -p "$tmp/mixed"
+echo 'TcpListener::bind("127.0.0.1:1")?;' >"$tmp/mixed/a.rs"
+echo 'TcpListener::bind("0.0.0.0:1")?;' >"$tmp/mixed/b.rs"
+if "$scripts/check-localhost-bind" "$tmp/mixed" >/dev/null 2>&1; then
+    echo "FAIL one bad file among clean ones"
+    failures=$((failures + 1))
+else
+    echo "ok   one bad file among clean ones"
+fi
+
+if [ "$failures" -ne 0 ]; then
+    echo "$failures test(s) failed"
+    exit 1
+fi
+echo "all tests passed"
