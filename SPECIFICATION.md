@@ -84,12 +84,12 @@ Must Have Requirements (Critical Delivery):
 - **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
 - **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
 - **FR-06: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
-- **FR-07: Multi-Occupant Trajectory Tracking:** Differentiate and track separate spatial centroids when multiple moving individuals occupy the same room or hallway.
 - **FR-8: Caregiver Dashboard:** Deliver an intuitive dashboard inside the native desktop application displaying room occupancy heatmaps, trigger boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
+- **FR-10: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
 
 Should Have Requirements (High Priority):
 
-- **FR-10: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
+- **FR-07: Multi-Occupant Trajectory Tracking:** Differentiate and track separate spatial centroids when multiple moving individuals occupy the same room or hallway.
 - **FR-11: False-Alarm Mitigation Filter:** Implement heuristic temporal debouncing and secondary state verification to prevent false alarms from dropped objects or pets.
 - **FR-12: Complementary Sensor Fusion Hooks:** Provide software ingestion interfaces for complementary low-cost sensors (e.g. floor pressure pads, PIR motion detectors, radar) to cross-validate Wi-Fi 7 detections.
 
