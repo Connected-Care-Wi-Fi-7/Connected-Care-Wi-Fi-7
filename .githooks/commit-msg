@@ -13,7 +13,7 @@ second=$(printf '%s\n' "$msg" | sed -n 2p)
 
 [ -n "$subject" ] || exit 0 # empty message: git aborts the commit itself
 
-"$hooks_dir/check-subject" commit "$subject" || exit 1
+"$hooks_dir/check-subject" "$subject" || exit 1
 
 if [ -n "$second" ]; then
     echo "error: leave a blank line between the subject and the body" >&2
