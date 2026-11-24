@@ -12,8 +12,8 @@ This guide explains how the team works on Connected Care Wi-Fi 7. Read it before
    - `chore/project-standards`
 3. **Commit** in small steps, following "Commits" below. The hooks in `.githooks/` check every commit (see "Local checks").
 4. **Open a pull request** against `main`. Fill in the template. The title follows "Commits" below but without a number, for example `feat(cc-dsp): add Hampel outlier filter`. No hook can check the title, so the reviewer does. A PR covers one parent issue and may also close that issue's sub-issues. Put one `Closes #<number>` line per issue under "Linked issue", because closing a parent issue does not close its sub-issues. Unrelated changes go in separate PRs. There is no line limit on a PR.
-5. **Review.** The PR's lead reviewer must approve it: the lead of the linked issue's area, or the Team Lead if you are that lead, or the backup reviewer if you are also the Team Lead. They are requested automatically (see "How review routing works" in `docs/ROLES.md`). Anyone else may review too. Every new push needs a fresh approval, every "Request changes" review must be resolved and every conversation resolved before merging. These rules apply to everyone, admins included. Reviewers check the Definition of Done below.
-6. **CI must be green** before merging.
+5. **Review.** The PR's lead reviewer must approve it: the lead of the linked issue's area, or the Team Lead if you are that lead, or the backup reviewer if you are also the Team Lead. They are requested automatically (see "How review routing works" in `docs/ROLES.md`). Anyone else may review too. If the PR changes anything under `.github/`, a code owner (the Platform & Integration lead or the Team Lead, but not the author) must also approve it, because a workflow there could fake a required check. Every new push needs a fresh approval, every "Request changes" review must be resolved and every conversation resolved before merging. These rules apply to everyone, admins included. Reviewers check the Definition of Done below.
+6. **CI must be green** before merging. The required checks are `rust`, `deny`, `localhost-bind` and `Lead approval`.
 7. **Squash merge.** Keep the PR title as the commit subject. GitHub appends the PR number, so every commit on `main` reads `type(scope): description (#<PR>)`, and the PR links to its issues.
 
 Never push directly to `main`.
@@ -111,7 +111,7 @@ The project requires all processing to stay on the local machine (FR-04, local e
 - Check every new dependency before adding it. It must not pull in network clients without a reason agreed in the issue.
 - Hardware and sensors are chosen by a local config file, not by a remote service.
 
-CI enforces these rules with two jobs:
+CI enforces these rules with two jobs. Both are required checks on `main`, so a PR cannot merge while either fails:
 
 - **`deny`** runs [`cargo-deny`](https://embarkstudios.github.io/cargo-deny/) with `deny.toml` over all features, so crates behind off-by-default hardware features are checked too. It fails on:
   - a banned crate: HTTP clients, HTTP/QUIC stacks, WebSockets, TLS libraries and telemetry or crash reporting. Each ban in `deny.toml` gives its reason. MQTT clients are not banned yet; that needs a team decision.
