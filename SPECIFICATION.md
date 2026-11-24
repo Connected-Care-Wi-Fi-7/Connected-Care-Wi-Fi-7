@@ -86,7 +86,6 @@ Must Have Requirements (Critical Delivery):
 - **FR-06: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
 - **FR-07: Multi-Occupant Trajectory Tracking:** Differentiate and track separate spatial centroids when multiple moving individuals occupy the same room or hallway.
 - **FR-8: Caregiver Dashboard:** Deliver an intuitive dashboard inside the native desktop application displaying room occupancy heatmaps, trigger boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
-- **FR-9: 2D RF Spatial Coordinate Mapping:** Implement a 2D occupancy map which displays moving objects and humans within a 2D space and height resembled in sheets of 2D planes.
 
 Should Have Requirements (High Priority):
 
