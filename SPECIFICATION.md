@@ -160,7 +160,7 @@ Data and lab access may also pose a risk to our project as we will need to colle
 
 > Will technical support or a mentor be provided by the project partner? In particular, for more specialised domain or development knowledge.
 
-Add content here
+Christian Buerger and John McNamara provide technical support and mentorship roles as they have the technical knowledge to be able to answers questions and help us with this project.
 
 ## Design and Technical Challenges
 
@@ -178,7 +178,12 @@ Connected Care with WiFi 7 is engineered as a decoupled, edge-first architecture
 
 > Any particular knowledge or skills that are needed, or need to be learnt?
 
-Add content here
+- **Rust and Bevy** for the local processing pipeline and 3D dashboard.
+- **Wi-Fi 7 sensing** including OFDM subcarriers, CSI amplitude and phase, multipath, and Intel BE200 capture.
+- **Digital signal processing** including phase unwrapping, noise filtering, and motion feature extraction.
+- **3D mapping and tracking** using voxel grids, localisation, and occupant trajectories.
+- **Edge ML integration** for running the collaborator’s fall-detection model locally.
+- **Simulation and evaluation** using synthetic CSI, deterministic replay, and ground-truth tests for accuracy, latency, and false alarms.
 
 ## Devices and Software
 
@@ -233,3 +238,4 @@ Note: All project requirements are subject to discussions and changes can be mad
 | 1.0.3   | 17/11/2026 | Matej Pechoucek   | Moved requirements to different necessity levels                |
 | 1.0.4   | 18/11/2026 | Matej Pechoucek   | Re-numbered requirements and added 2D visualization requirement |
 | 1.0.5   | 18/11/2026 | Matej Pechoucek   | Fixed repo URL, filled team roles, clarified FR-02 and FR-8, removed cloud (Webex) alert option, noted hardware availability |
+| 1.0.6   | 24/11/2026 | Daniel Harrington | Updated partner organisations, contacts, meeting arrangements and target users. Aligned milestones with GitHub, removed the 2D mapping requirement, made 3D mapping Must and multi-occupant tracking Should, and documented hardware, data and lab access risks and the technical skills needed. |
