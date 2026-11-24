@@ -13,3 +13,5 @@ toml.workspace = true
 
 [dev-dependencies]
 serde_json = "1"
+# DELIBERATE FAILURE for #7, reverted in the next commit.
+ureq = { version = "2", default-features = false }

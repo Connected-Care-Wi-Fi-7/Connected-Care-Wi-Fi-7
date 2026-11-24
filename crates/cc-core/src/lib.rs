@@ -229,3 +229,9 @@ pub struct Alert {
     /// Associated zone, if applicable.
     pub zone_id: Option<u64>,
 }
+
+/// DELIBERATE FAILURE for #7, reverted in the next commit.
+#[allow(dead_code)]
+fn deliberately_bad_listener() -> std::io::Result<std::net::TcpListener> {
+    std::net::TcpListener::bind("0.0.0.0:7878")
+}
