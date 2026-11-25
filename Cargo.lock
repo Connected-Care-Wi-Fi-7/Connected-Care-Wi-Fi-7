@@ -2204,6 +2204,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cc-mapping"
+version = "0.1.0"
+dependencies = [
+ "cc-core",
+ "serde",
+ "thiserror 2.0.21",
+ "toml",
+]
+
+[[package]]
 name = "cc-viewer"
 version = "0.1.0"
 dependencies = [
