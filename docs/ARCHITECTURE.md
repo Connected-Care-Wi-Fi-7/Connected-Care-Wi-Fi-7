@@ -53,7 +53,7 @@ Four traits in `cc-core` define where the pipeline can swap implementations. See
 | --- | --- | --- | --- |
 | `CsiSource` | Supplies a stream of CSI frames to the pipeline | Simulator, file replay | A real driver crate such as `cc-driver-be200` |
 | `FallClassifier` | Decides whether a fall has occurred from tracking and motion data | A stub threshold detector | The model from the external collaborator |
-| `AuxSensor` | Supplies readings from complementary sensors to cross-check Wi-Fi detections (FR-12, sensor fusion hooks) | Simulated PIR and pressure pad | Real sensors |
+| `AuxSensor` | Supplies readings from complementary sensors to cross-check Wi-Fi detections (FR-11, sensor fusion hooks) | Simulated PIR and pressure pad | Real sensors |
 | `AlertSink` | Delivers an alert somewhere | Local log and in-app alert panel | MQTT, nurse-call or other integrations |
 
 Implementations are compiled into the caller, with real hardware drivers behind Cargo features that are off by default. The caller selects among available implementations at startup using a local config file.
@@ -109,6 +109,6 @@ The same steps apply to a real `AuxSensor` or `AlertSink`.
 
 ## Constraints from the specification
 
-- Everything runs locally (FR-04, local edge processing). No outbound network code. Any listener binds to `127.0.0.1` only.
-- No personally identifiable information in the repository or in test data (FR-05, privacy-first testing).
+- Everything runs locally (FR-05, local edge processing). No outbound network code. Any listener binds to `127.0.0.1` only.
+- No personally identifiable information in the repository or in test data (FR-06, privacy-first testing).
 - Acceptance targets in the specification (250 ms alert latency, 35 cm centroid error) can only be measured on simulated data until hardware is available. Reports must say which results are simulator-verified.
