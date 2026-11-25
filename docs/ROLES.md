@@ -44,7 +44,7 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-core` (data contracts, traits, config), `cc-pipeline` (stage wiring), CI, and the fall-classifier seam.
 - **Area label:** `area:platform`.
-- **Requirements:** FR-04 (local edge processing), and FR-02 (fall detection classifier, integration only, because the model itself comes from the external collaborator).
+- **Requirements:** FR-05 (local edge processing), and FR-03 (fall detection classifier, integration only, because the model itself comes from the external collaborator).
 - **Lead looks after:** keep releases and CI healthy, and act as contact point for the external ML developer.
 - **Team goal for M1:**
   - `cc-core` contracts and the four plug-in traits are merged and documented.
@@ -56,7 +56,7 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-sim` (scripted scenes to synthetic CSI, recording and replay), the hardware driver stub, and the auxiliary sensor hooks.
 - **Area label:** `area:sensing`.
-- **Requirements:** FR-01 (CSI capture pipeline), FR-05 (synthetic and controlled testing with zero PII), FR-12 (sensor fusion hooks).
+- **Requirements:** FR-01 (CSI capture pipeline), FR-06 (synthetic and controlled testing with zero PII), FR-11 (sensor fusion hooks).
 - **Lead looks after:** keep the dataset provenance register and make sure no PII enters the repository.
 - **Team goal for M1:**
   - The simulator produces a stream of `CsiFrame` values for a scripted room scene (walking, sitting, a fall, two occupants).
@@ -67,8 +67,8 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-dsp` (phase sanitisation and unwrapping, Hampel filter, DWT denoising, motion features).
 - **Area label:** `area:dsp`.
-- **Requirements:** FR-01 (the processing side), and FR-14 (respiration sensing) later if time permits.
-- **Lead looks after:** performance benchmarks, producing the numbers needed for FR-06 (evaluation report).
+- **Requirements:** FR-01 (the processing side), and FR-13 (respiration sensing) later if time permits.
+- **Lead looks after:** performance benchmarks, producing the numbers needed for FR-07 (evaluation report).
 - **Team goal for M1:**
   - Phase sanitisation and unwrapping are implemented and tested.
   - The Hampel outlier filter is implemented and tested.
@@ -78,7 +78,7 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `cc-mapping` (room model, voxel grid, centroids, multi-occupant tracking).
 - **Area label:** `area:mapping`.
-- **Requirements:** FR-09 (2D spatial mapping), FR-10 (3D spatial mapping), FR-07 (multi-occupant tracking).
+- **Requirements:** FR-02 (3D spatial mapping), FR-09 (multi-occupant tracking).
 - **Lead looks after:** accuracy evaluation against ground truth.
 - **Team goal for M1:**
   - The room model and voxel grid are built from the config file.
@@ -89,7 +89,7 @@ The fall-detection model is built by an external collaborator, not by the five t
 
 - **Covers:** `apps/viewer` (the Bevy desktop app: 3D view, zone editor, alert panel) and `cc-alerts` (zones, rules, debounce, sinks).
 - **Area labels:** `area:dashboard` and `area:alerts`.
-- **Requirements:** FR-03 (spatial triggers), FR-11 (false-alarm mitigation), FR-08 (caregiver dashboard).
+- **Requirements:** FR-04 (spatial triggers), FR-10 (false-alarm mitigation), FR-08 (caregiver dashboard).
 - **Lead looks after:** demo readiness and partner-facing user experience.
 - **Team goal for M1:**
   - The Bevy app has a structure with plugins and a bridge to the pipeline.
