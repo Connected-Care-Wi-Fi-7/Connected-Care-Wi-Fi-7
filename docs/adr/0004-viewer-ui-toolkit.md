@@ -21,7 +21,7 @@ Two options integrate with Bevy 0.20, the version pinned in the workspace:
 
 We will use `egui` through `bevy_egui` for the viewer's 2D interface.
 
-We will enable only the `render`, `default_fonts` and `picking` features. The default `open_url` feature opens links in a web browser and `manage_clipboard` adds clipboard crates; the viewer needs neither, and leaving `open_url` off keeps the app free of anything that reaches outside the machine (FR-04, local edge processing). `picking` lets egui panels block mouse input from reaching the 3D scene, which the zone editor and orbit camera need.
+We will enable only the `render`, `default_fonts` and `picking` features. The default `open_url` feature opens links in a web browser and `manage_clipboard` adds clipboard crates; the viewer needs neither, and leaving `open_url` off keeps the app free of anything that reaches outside the machine (FR-05, local edge processing). `picking` lets egui panels block mouse input from reaching the 3D scene, which the zone editor and orbit camera need.
 
 UI code stays in the viewer's `ui` module and reads only bridge resources and messages, so the toolkit can be replaced without touching the bridge or the scene.
 
