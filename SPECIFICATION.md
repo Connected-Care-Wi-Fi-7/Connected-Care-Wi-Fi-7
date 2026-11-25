@@ -23,27 +23,31 @@
 | Ben Dalton | <benjamin.dalton.25@ucl.ac.uk> | Signal Processing lead |
 | Mariha Subhan | <mariha.subhan.24@ucl.ac.uk> | Final Year Student Collaborator |
 
-## Partner Organisation
+## Partner Organisations
 
-Intel, Intel Capital, IBM, Dell, HP
+- Intel
+- Intel Capital
+- IBM
+- Dell
+- HP
 
 ### Overview of Partner Organisation
 
-Professor Dean Mohamedally acts as the spokesperson and coordinator for all partners and has the final say in decisions.
+Intel, Intel Capital, IBM, Dell and HP are partner organisations in the Connected Care Wi-Fi 7 project. Their technical contacts provide feedback on the team’s approach and help answer questions about hardware and integration.
 
 ### Partner Contacts
 
 | Contact Name | Job Title | Email | Phone Number |
 | ------------ | --------- | ----- | ------------ |
-| Christian A. Buerger | N/A | <christian.a.buerger@intel.com> | N/A |
-| John McNamara | N/A | <j0nnymac@uk.ibm.com> | N/A |
-| Dr. Atia Rafiq | N/A | <atia.rafiq@nhs.net> | N/A |
+| Christian A. Buerger | Director Portfolio Growth | <christian.a.buerger@intel.com> | N/A |
+| John McNamara | IBM Master Inventor | <j0nnymac@uk.ibm.com> | N/A |
+| Dr. Atia Rafiq | NHS GP | <atia.rafiq@nhs.net> | N/A |
 
 ### Communication and Meetings
 
 > How often the team meets the partner, through which channel (e.g., Teams, email, Slack), and who the main contact is on each side.
 
-As of 24/11/2026, we are having fortnightly Monday meetings, though this may change to weekly when the project picks up and we receive hardware. Contact with the partners is done by email, with meetings through Teams. Usually, Daniel Harrington (Team Lead) contacts Christian Buerger on behalf of the team to schedule meetings and share resources.
+As of 24/11/2026, we are having fortnightly Monday meetings, though this may change to weekly when the project picks up and we receive hardware. Contact with the partners is done by email, with meetings through Teams and recorded for review. Usually, Daniel Harrington (Team Lead) contacts Christian Buerger on behalf of the team to schedule meetings and share resources.
 
 ## Project Description
 
