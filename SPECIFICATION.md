@@ -80,19 +80,19 @@ Unobserved patient falls in residential care facilities and geriatric wards repr
 Must Have Requirements (Critical Delivery):
 
 - **FR-01: Wi-Fi 7 CSI Data Capture Pipeline:** Implement a driver and telemetry ingestion service interfacing with Intel Wi-Fi 7 hardware to extract raw subcarrier Channel State Information (CSI) and amplitude/phase matrices.
-- **FR-10: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
-- **FR-02: Edge-Based Fall Detection Classifier:** Integrate a local machine learning classifier that identifies acute fall signatures, distinguishing rapid vertical descents from controlled reclining or sitting. The model is developed by an external collaborator; the team provides the integration interface and a stub threshold classifier to use until the model is ready.
-- **FR-03: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set recorded movements or designated 3D coordinate volumes as custom event triggers that dispatch alerts upon detection.
-- **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
-- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
-- **FR-06: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
-- **FR-8: Caregiver Dashboard:** Deliver an intuitive dashboard inside the native desktop application displaying room occupancy heatmaps, trigger boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
+- **FR-02: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
+- **FR-03: Edge-Based Fall Detection Classifier:** Integrate a local machine learning classifier that identifies acute fall signatures, distinguishing rapid vertical descents from controlled reclining or sitting. The model is developed by an external collaborator; the team provides the integration interface and a stub threshold classifier to use until the model is ready.
+- **FR-04: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set recorded movements or designated 3D coordinate volumes as custom event triggers that dispatch alerts upon detection.
+- **FR-05: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
+- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
+- **FR-07: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
+- **FR-08: Caregiver Dashboard:** Deliver an intuitive dashboard inside the native desktop application displaying room occupancy heatmaps, trigger boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
 
 Should Have Requirements (High Priority):
 
-- **FR-07: Multi-Occupant Trajectory Tracking:** Differentiate and track separate spatial centroids when multiple moving individuals occupy the same room or hallway.
-- **FR-11: False-Alarm Mitigation Filter:** Implement heuristic temporal debouncing and secondary state verification to prevent false alarms from dropped objects or pets.
-- **FR-12: Complementary Sensor Fusion Hooks:** Provide software ingestion interfaces for complementary low-cost sensors (e.g. floor pressure pads, PIR motion detectors, radar) to cross-validate Wi-Fi 7 detections.
+- **FR-09: Multi-Occupant Trajectory Tracking:** Differentiate and track separate spatial centroids when multiple moving individuals occupy the same room or hallway.
+- **FR-10: False-Alarm Mitigation Filter:** Implement heuristic temporal debouncing and secondary state verification to prevent false alarms from dropped objects or pets.
+- **FR-11: Complementary Sensor Fusion Hooks:** Provide software ingestion interfaces for complementary low-cost sensors (e.g. floor pressure pads, PIR motion detectors, radar) to cross-validate Wi-Fi 7 detections.
 
 ## Stretch Requirements
 
@@ -100,9 +100,9 @@ Should Have Requirements (High Priority):
 
 Could Have Requirements:
 
-- **FR-13: Multi-Link Operation (MLO) Band Steering:** Evaluate dynamic band switching across 5 GHz and 6 GHz to prioritize sensing sensitivity during high network traffic.
-- **FR-14: Subtle Respiration & Micro-Movement Sensing:** Experiment with subcarrier phase variance to estimate stationary chest movements and nocturnal resting patterns when occupants are in bed.
-- **FR-15: Smart Facility IoT Actuation:** Dispatch automated IoT triggers to illuminate pathway lighting or unlock automated room doors when an occupant stands up at night.
+- **FR-12: Multi-Link Operation (MLO) Band Steering:** Evaluate dynamic band switching across 5 GHz and 6 GHz to prioritize sensing sensitivity during high network traffic.
+- **FR-13: Subtle Respiration & Micro-Movement Sensing:** Experiment with subcarrier phase variance to estimate stationary chest movements and nocturnal resting patterns when occupants are in bed.
+- **FR-14: Smart Facility IoT Actuation:** Dispatch automated IoT triggers to illuminate pathway lighting or unlock automated room doors when an occupant stands up at night.
 
 ## Target Users and Stakeholders
 
@@ -153,8 +153,8 @@ Data and lab access may also pose a risk to our project as we will need to colle
 > What are the strategies for testing the software (unit, functional, integration, regression)? How will the output from AI be evaluated for correctness and accuracy?
 
 - **Network & Sensing Performance Evaluation:** Benchmark detection latency, packet availability, classification accuracy, and network QoS to quantify the trade-offs of concurrent sensing and data communication over Wi-Fi 7.
-- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
-- **FR-06: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
+- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
+- **FR-07: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
 
 ## Technical and/or Mentor Support Availability
 
@@ -195,13 +195,13 @@ Connected Care with WiFi 7 is engineered as a decoupled, edge-first architecture
 
 > Specific resources needed to support AI use or development. Will they be available?
 
-- **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
+- **FR-05: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
 
 ## Data
 
 > Any data required for the project. Is it freely available, and not subject to any restrictions such as copyright? Will the data be available on time, and does it have any special storage requirements (e.g., due to size or restricted accessibility)?
 
-- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
+- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
 
 ## Ethical Approval and GDPR Compliance
 
@@ -239,3 +239,4 @@ Note: All project requirements are subject to discussions and changes can be mad
 | 1.0.4   | 18/11/2026 | Matej Pechoucek   | Re-numbered requirements and added 2D visualization requirement |
 | 1.0.5   | 18/11/2026 | Matej Pechoucek   | Fixed repo URL, filled team roles, clarified FR-02 and FR-8, removed cloud (Webex) alert option, noted hardware availability |
 | 1.0.6   | 24/11/2026 | Daniel Harrington | Updated partner organisations, contacts, meeting arrangements and target users. Aligned milestones with GitHub, removed the 2D mapping requirement, made 3D mapping Must and multi-occupant tracking Should, and documented hardware, data and lab access risks and the technical skills needed. |
+| 1.0.7   | 25/11/2026 | Matej Pechoucek   | Renumbered requirements FR-01 to FR-14 in document order |
