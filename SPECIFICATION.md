@@ -23,29 +23,31 @@
 | Ben Dalton | <benjamin.dalton.25@ucl.ac.uk> | Signal Processing lead |
 | Mariha Subhan | <mariha.subhan.24@ucl.ac.uk> | Final Year Student Collaborator |
 
-## Partner Organisation
+## Partner Organisations
 
-| Field | Value |
-| ----- | ----- |
-| Partner Organisation Name | Intel Capital |
-| Address of Partner Organisation | N/A |
+- Intel
+- Intel Capital
+- IBM
+- Dell
+- HP
 
 ### Overview of Partner Organisation
 
-Add content here
+Intel, Intel Capital, IBM, Dell and HP are partner organisations in the Connected Care Wi-Fi 7 project. Their technical contacts provide feedback on the team’s approach and help answer questions about hardware and integration.
 
 ### Partner Contacts
 
 | Contact Name | Job Title | Email | Phone Number |
 | ------------ | --------- | ----- | ------------ |
-| Phillippa Chick | N/A | <phillippa.chick@intel.com> | N/A |
-| Christian A. Buerger | N/A | <christian.a.buerger@intel.com> | N/A |
+| Christian A. Buerger | Director Portfolio Growth | <christian.a.buerger@intel.com> | N/A |
+| John McNamara | IBM Master Inventor | <j0nnymac@uk.ibm.com> | N/A |
+| Dr. Atia Rafiq | NHS GP | <atia.rafiq@nhs.net> | N/A |
 
 ### Communication and Meetings
 
 > How often the team meets the partner, through which channel (e.g., Teams, email, Slack), and who the main contact is on each side.
 
-Add content here
+As of 24/11/2026, we are having fortnightly Monday meetings, though this may change to weekly when the project picks up and we receive hardware. Contact with the partners is done by email, with meetings through Teams and recorded for review. Usually, Daniel Harrington (Team Lead) contacts Christian Buerger on behalf of the team to schedule meetings and share resources.
 
 ## Project Description
 
@@ -68,9 +70,10 @@ Unobserved patient falls in residential care facilities and geriatric wards repr
 
 > Key dates, interim deliverables and partner demo points.
 
-- **Phase 1: Wi-Fi 7 CSI Ingestion & Testbed Setup (Oct – Nov 2026), Weeks 1 – 4:** Configure Intel Wi-Fi 7 testbed with final year student; implement CSI extraction driver; benchmark baseline packet availability and noise floors.
-- **Phase 2: Signal Filtering & 3D Mapping Core (Nov – Dec 2026), Weeks 5 – 8:** Build phase unwrapping and wavelet filters; reconstruct 3D occupancy voxel grid; integrate the fall-classifier interface with a stub classifier.
-- **Phase 3: Trigger Automation & Feasibility Benchmarking (Jan – Feb 2027), Weeks 9 – 12:** Implement user-defined spatial alert triggers; test false-positive rejection; evaluate network throughput trade-offs; author technical evaluation.
+- **Milestone 0: Foundations:** Workspace merged with contracts and traits agreed, CI green with tests
+- **Milestone 1: Walking Skeleton:** Simulated scene flows end to end into the Bevy app using fakes and a scripted fall raises an alert, ready to demo for Dell on 8/12/26
+- **Milestone 2: Real Algorithms on Simulated Data:** Fakes replaced by real DSP, mapping, tracking with acceptance numbers measured on simulator
+- **Milestone 3: Hardware Integration and Client Evaluation:** BE200 source plugged in once hardware arrives and evaluation report drafted from discussion with clients
 - **Hard Deadline 1: Software Delivery, Friday, 12 March 2027:** Full Software Code Delivery: Feature-frozen CSI pipeline, 3D visualizer, fall detection model integration, alert manager, test suites, and documentation.
 - **Hard Deadline 2: Website & Video Delivery, Tuesday, 16 March 2027:** Public IXN Website & Video: Complete project website, technical architecture walkthrough, demonstrator showcase video, and research report.
 
@@ -81,20 +84,19 @@ Unobserved patient falls in residential care facilities and geriatric wards repr
 Must Have Requirements (Critical Delivery):
 
 - **FR-01: Wi-Fi 7 CSI Data Capture Pipeline:** Implement a driver and telemetry ingestion service interfacing with Intel Wi-Fi 7 hardware to extract raw subcarrier Channel State Information (CSI) and amplitude/phase matrices.
-- **FR-02: Edge-Based Fall Detection Classifier:** Integrate a local machine learning classifier that identifies acute fall signatures, distinguishing rapid vertical descents from controlled reclining or sitting. The model is developed by an external collaborator; the team provides the integration interface and a stub threshold classifier to use until the model is ready.
-- **FR-03: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set recorded movements or designated 3D coordinate volumes as custom event triggers that dispatch alerts upon detection.
-- **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
-- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
-- **FR-06: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
-- **FR-07: Multi-Occupant Trajectory Tracking:** Differentiate and track separate spatial centroids when multiple moving individuals occupy the same room or hallway.
-- **FR-8: Caregiver Dashboard:** Deliver an intuitive dashboard inside the native desktop application displaying room occupancy heatmaps, trigger boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
-- **FR-9: 2D RF Spatial Coordinate Mapping:** Implement a 2D occupancy map which displays moving objects and humans within a 2D space and height resembled in sheets of 2D planes.
+- **FR-02: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
+- **FR-03: Edge-Based Fall Detection Classifier:** Integrate a local machine learning classifier that identifies acute fall signatures, distinguishing rapid vertical descents from controlled reclining or sitting. The model is developed by an external collaborator; the team provides the integration interface and a stub threshold classifier to use until the model is ready.
+- **FR-04: Spatial Trigger & Motion Alert Framework:** Enable caregivers to set recorded movements or designated 3D coordinate volumes as custom event triggers that dispatch alerts upon detection.
+- **FR-05: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
+- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
+- **FR-07: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
+- **FR-08: Caregiver Dashboard:** Deliver an intuitive dashboard inside the native desktop application displaying room occupancy heatmaps, trigger boundaries, and live alert telemetry. Nothing is hosted beyond localhost.
 
 Should Have Requirements (High Priority):
 
-- **FR-10: 3D RF Spatial Coordinate Mapping:** Generate an interactive, real-time 3D visual occupancy map displaying moving objects and human centroids within the RF propagation sphere.
-- **FR-11: False-Alarm Mitigation Filter:** Implement heuristic temporal debouncing and secondary state verification to prevent false alarms from dropped objects or pets.
-- **FR-12: Complementary Sensor Fusion Hooks:** Provide software ingestion interfaces for complementary low-cost sensors (e.g. floor pressure pads, PIR motion detectors, radar) to cross-validate Wi-Fi 7 detections.
+- **FR-09: Multi-Occupant Trajectory Tracking:** Differentiate and track separate spatial centroids when multiple moving individuals occupy the same room or hallway.
+- **FR-10: False-Alarm Mitigation Filter:** Implement heuristic temporal debouncing and secondary state verification to prevent false alarms from dropped objects or pets.
+- **FR-11: Complementary Sensor Fusion Hooks:** Provide software ingestion interfaces for complementary low-cost sensors (e.g. floor pressure pads, PIR motion detectors, radar) to cross-validate Wi-Fi 7 detections.
 
 ## Stretch Requirements
 
@@ -102,15 +104,19 @@ Should Have Requirements (High Priority):
 
 Could Have Requirements:
 
-- **FR-13: Multi-Link Operation (MLO) Band Steering:** Evaluate dynamic band switching across 5 GHz and 6 GHz to prioritize sensing sensitivity during high network traffic.
-- **FR-14: Subtle Respiration & Micro-Movement Sensing:** Experiment with subcarrier phase variance to estimate stationary chest movements and nocturnal resting patterns when occupants are in bed.
-- **FR-15: Smart Facility IoT Actuation:** Dispatch automated IoT triggers to illuminate pathway lighting or unlock automated room doors when an occupant stands up at night.
+- **FR-12: Multi-Link Operation (MLO) Band Steering:** Evaluate dynamic band switching across 5 GHz and 6 GHz to prioritize sensing sensitivity during high network traffic.
+- **FR-13: Subtle Respiration & Micro-Movement Sensing:** Experiment with subcarrier phase variance to estimate stationary chest movements and nocturnal resting patterns when occupants are in bed.
+- **FR-14: Smart Facility IoT Actuation:** Dispatch automated IoT triggers to illuminate pathway lighting or unlock automated room doors when an occupant stands up at night.
 
 ## Target Users and Stakeholders
 
 > Who will actually use the system (the partner's staff, customers, the public). Requirements, testing and ethics decisions all depend on this.
 
-Add content here
+There are two main areas for target users:
+- Family of an elderly person. The system's primary deployment aim is to monitor a vulnerable person within a domestic household.
+- Care home workers. The system's secondary deployment aim is monitor many residents of a care home.
+
+In order to understand the interests of these individuals, we will speak with our patner contacts, in particular Dr. Atia Rafiq, an NHS doctor.
 
 ## Out of Scope
 
@@ -132,7 +138,9 @@ Add content here
 
 > Identify any constraints on what can be done (e.g., time, technology, data access) and how risk can be mitigated (managed).
 
-Add content here
+Our project is very hardware dependent. We have planned development to achieve as much as possible without hardware by simulating CSI data initially, but there may come a point where lack hardware is a block on our project developing any further. This should mitigate the risk of limited time resulting in poor quality hardware development.
+
+Data and lab access may also pose a risk to our project as we will need to collect and simulate data ourselves in order to be able to test the system. This could involve having a test subject move around or fall over lab. To mitigate this, we will collect and store data so we can simulate and test our code without needing to have a live setup.
 
 ## Acceptance Criteria
 
@@ -149,14 +157,14 @@ Add content here
 > What are the strategies for testing the software (unit, functional, integration, regression)? How will the output from AI be evaluated for correctness and accuracy?
 
 - **Network & Sensing Performance Evaluation:** Benchmark detection latency, packet availability, classification accuracy, and network QoS to quantify the trade-offs of concurrent sensing and data communication over Wi-Fi 7.
-- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
-- **FR-06: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
+- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
+- **FR-07: Feasibility & Performance Evaluation Report:** Deliver a comprehensive academic and empirical evaluation analyzing Wi-Fi 7 sensing accuracy, latency, packet availability, and concurrent communication throughput.
 
 ## Technical and/or Mentor Support Availability
 
 > Will technical support or a mentor be provided by the project partner? In particular, for more specialised domain or development knowledge.
 
-Add content here
+Christian Buerger and John McNamara provide technical support and mentorship roles as they have the technical knowledge to be able to answers questions and help us with this project.
 
 ## Design and Technical Challenges
 
@@ -174,7 +182,12 @@ Connected Care with WiFi 7 is engineered as a decoupled, edge-first architecture
 
 > Any particular knowledge or skills that are needed, or need to be learnt?
 
-Add content here
+- **Rust and Bevy** for the local processing pipeline and 3D dashboard.
+- **Wi-Fi 7 sensing** including OFDM subcarriers, CSI amplitude and phase, multipath, and Intel BE200 capture.
+- **Digital signal processing** including phase unwrapping, noise filtering, and motion feature extraction.
+- **3D mapping and tracking** using voxel grids, localisation, and occupant trajectories.
+- **Edge ML integration** for running the collaborator’s fall-detection model locally.
+- **Simulation and evaluation** using synthetic CSI, deterministic replay, and ground-truth tests for accuracy, latency, and false alarms.
 
 ## Devices and Software
 
@@ -186,13 +199,13 @@ Add content here
 
 > Specific resources needed to support AI use or development. Will they be available?
 
-- **FR-04: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
+- **FR-05: Local Edge Processing (Zero Cloud Dependency):** Execute all signal processing, 3D mapping, and inference locally on an on-premise edge gateway without transmitting raw RF or sensor data off-site.
 
 ## Data
 
 > Any data required for the project. Is it freely available, and not subject to any restrictions such as copyright? Will the data be available on time, and does it have any special storage requirements (e.g., due to size or restricted accessibility)?
 
-- **FR-05: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
+- **FR-06: Privacy-First Synthetic & Controlled Testing:** Conduct all model training and validation using public anonymized datasets, synthetic RF perturbations, or controlled laboratory simulations with zero PII.
 
 ## Ethical Approval and GDPR Compliance
 
@@ -229,3 +242,5 @@ Note: All project requirements are subject to discussions and changes can be mad
 | 1.0.3   | 17/11/2026 | Matej Pechoucek   | Moved requirements to different necessity levels                |
 | 1.0.4   | 18/11/2026 | Matej Pechoucek   | Re-numbered requirements and added 2D visualization requirement |
 | 1.0.5   | 18/11/2026 | Matej Pechoucek   | Fixed repo URL, filled team roles, clarified FR-02 and FR-8, removed cloud (Webex) alert option, noted hardware availability |
+| 1.0.6   | 24/11/2026 | Daniel Harrington | Updated partner organisations, contacts, meeting arrangements and target users. Aligned milestones with GitHub, removed the 2D mapping requirement, made 3D mapping Must and multi-occupant tracking Should, and documented hardware, data and lab access risks and the technical skills needed. |
+| 1.0.7   | 25/11/2026 | Matej Pechoucek   | Renumbered requirements FR-01 to FR-14 in document order |

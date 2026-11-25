@@ -47,7 +47,7 @@ jobs:
         with:
           arguments: --all-features
 
-  # Listeners must bind to 127.0.0.1 only (FR-04, CONTRIBUTING.md zero-cloud rules).
+  # Listeners must bind to 127.0.0.1 only (FR-05, CONTRIBUTING.md zero-cloud rules).
   localhost-bind:
     runs-on: ubuntu-latest
     steps:

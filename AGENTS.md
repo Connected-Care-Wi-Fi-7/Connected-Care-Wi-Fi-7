@@ -19,7 +19,7 @@ The rest of the crates in `docs/ARCHITECTURE.md` (`cc-sim`, `cc-dsp`, `cc-mappin
 
 | Document | What it tells you |
 | --- | --- |
-| `SPECIFICATION.md` | Requirements (FR-01 to FR-15) and acceptance targets. When you cite a requirement, give its number and name, for example "FR-03 (spatial triggers)", so a renumbering cannot silently change its meaning |
+| `SPECIFICATION.md` | Requirements (FR-01 to FR-14) and acceptance targets. When you cite a requirement, give its number and name, for example "FR-04 (spatial triggers)", so a renumbering cannot silently change its meaning |
 | `CONTRIBUTING.md` | Workflow, Definition of Done, coding, zero-cloud and privacy rules |
 | `docs/ARCHITECTURE.md` | Target crate layout, data flow, plug-in traits, dependency rule |
 | `docs/ROLES.md` | Areas, area leads and how reviews are routed |
@@ -56,7 +56,7 @@ The first build compiles Bevy and takes several minutes. That is normal.
 - Crates communicate only through types and traits defined in `cc-core`. A crate must not depend on another stage crate (for example, `cc-mapping` never imports `cc-dsp`); `cc-pipeline` wires them together.
 - **`cc-core` contracts are sensitive.** Changing its data types or traits needs an ADR and a review from the Platform & Integration lead. If your task needs such a change, stop and say so instead of making it silently.
 - Hardware sits behind one of the four traits (`CsiSource`, `FallClassifier`, `AuxSensor`, `AlertSink`) and a cargo feature that is off by default. Implementations are chosen by a local config file. No dynamic library loading.
-- The fall-detection model (FR-02, fall detection classifier) comes from an external collaborator. Only build the `FallClassifier` seam and the stub classifier; do not write ML training code or create model-training tasks.
+- The fall-detection model (FR-03, fall detection classifier) comes from an external collaborator. Only build the `FallClassifier` seam and the stub classifier; do not write ML training code or create model-training tasks.
 - New crates go in `crates/`, are named `cc-<name>`, and take `version`, `edition`, `rust-version` and `publish` from the workspace (`version.workspace = true` and so on). Shared dependency versions go in `[workspace.dependencies]`.
 
 ## Rust rules
@@ -69,7 +69,7 @@ The first build compiles Bevy and takes several minutes. That is normal.
 
 ## Zero-cloud and privacy rules
 
-These are hard requirements (FR-04 local edge processing, FR-05 privacy-first testing), not preferences.
+These are hard requirements (FR-05 local edge processing, FR-06 privacy-first testing), not preferences.
 
 - No outbound network code: no HTTP clients, telemetry, crash reporting or update checks.
 - Any listener binds to `127.0.0.1` only, never `0.0.0.0`.

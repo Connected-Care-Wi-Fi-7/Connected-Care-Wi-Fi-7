@@ -1,6 +1,6 @@
 # cargo-deny configuration (issue #7).
 #
-# Enforces FR-04 (local edge processing, zero cloud dependency) and the
+# Enforces FR-05 (local edge processing, zero cloud dependency) and the
 # dependency rules in CONTRIBUTING.md automatically in CI. Run locally with
 # `cargo deny check`. Docs: https://embarkstudios.github.io/cargo-deny/
 
@@ -49,31 +49,31 @@ multiple-versions = "warn"
 wildcards = "allow"
 
 # Crates that make or serve network connections. The app runs entirely on the
-# local machine (FR-04), so none of these should ever appear in the tree.
+# local machine (FR-05), so none of these should ever appear in the tree.
 # MQTT clients are deliberately not listed: off-machine alert sinks are out of
 # scope for #7, not forbidden, and need a team decision first.
 deny = [
     # HTTP clients
-    { crate = "reqwest", reason = "outbound HTTP client; FR-04 zero cloud" },
-    { crate = "ureq", reason = "outbound HTTP client; FR-04 zero cloud" },
-    { crate = "isahc", reason = "outbound HTTP client; FR-04 zero cloud" },
-    { crate = "surf", reason = "outbound HTTP client; FR-04 zero cloud" },
-    { crate = "attohttpc", reason = "outbound HTTP client; FR-04 zero cloud" },
-    { crate = "awc", reason = "outbound HTTP client; FR-04 zero cloud" },
-    { crate = "curl", reason = "libcurl bindings; FR-04 zero cloud" },
-    { crate = "curl-sys", reason = "libcurl bindings; FR-04 zero cloud" },
+    { crate = "reqwest", reason = "outbound HTTP client; FR-05 zero cloud" },
+    { crate = "ureq", reason = "outbound HTTP client; FR-05 zero cloud" },
+    { crate = "isahc", reason = "outbound HTTP client; FR-05 zero cloud" },
+    { crate = "surf", reason = "outbound HTTP client; FR-05 zero cloud" },
+    { crate = "attohttpc", reason = "outbound HTTP client; FR-05 zero cloud" },
+    { crate = "awc", reason = "outbound HTTP client; FR-05 zero cloud" },
+    { crate = "curl", reason = "libcurl bindings; FR-05 zero cloud" },
+    { crate = "curl-sys", reason = "libcurl bindings; FR-05 zero cloud" },
     # HTTP / transport stacks
     { crate = "hyper", reason = "HTTP client and server stack; the UI is native Bevy, so no web server is needed. Open an issue if a localhost-only dashboard is ever wanted" },
-    { crate = "h2", reason = "HTTP/2 stack; FR-04 zero cloud" },
-    { crate = "quinn", reason = "QUIC transport; FR-04 zero cloud" },
+    { crate = "h2", reason = "HTTP/2 stack; FR-05 zero cloud" },
+    { crate = "quinn", reason = "QUIC transport; FR-05 zero cloud" },
     # WebSockets
-    { crate = "tungstenite", reason = "WebSocket client/server; FR-04 zero cloud" },
-    { crate = "tokio-tungstenite", reason = "WebSocket client/server; FR-04 zero cloud" },
-    { crate = "async-tungstenite", reason = "WebSocket client/server; FR-04 zero cloud" },
+    { crate = "tungstenite", reason = "WebSocket client/server; FR-05 zero cloud" },
+    { crate = "tokio-tungstenite", reason = "WebSocket client/server; FR-05 zero cloud" },
+    { crate = "async-tungstenite", reason = "WebSocket client/server; FR-05 zero cloud" },
     # TLS: an offline app has no use for it
-    { crate = "rustls", reason = "TLS implies remote connections; FR-04 zero cloud" },
-    { crate = "native-tls", reason = "TLS implies remote connections; FR-04 zero cloud" },
-    { crate = "openssl", reason = "TLS implies remote connections; FR-04 zero cloud" },
+    { crate = "rustls", reason = "TLS implies remote connections; FR-05 zero cloud" },
+    { crate = "native-tls", reason = "TLS implies remote connections; FR-05 zero cloud" },
+    { crate = "openssl", reason = "TLS implies remote connections; FR-05 zero cloud" },
     # Telemetry and crash reporting
     { crate = "sentry", reason = "crash reporting to a remote service; CONTRIBUTING zero-cloud rules" },
     { crate = "opentelemetry-otlp", reason = "telemetry export; CONTRIBUTING zero-cloud rules" },
