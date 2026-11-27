@@ -18,7 +18,7 @@ fail() {
     exit 1
 }
 
-# Messages git writes itself pass unchecked; squash merge replaces them.
+# Messages git writes itself pass unchecked; fixups are folded in before merging.
 case "$subject" in
 'Merge '* | 'Revert "'* | 'fixup! '* | 'squash! '* | 'amend! '*) exit 0 ;;
 esac
