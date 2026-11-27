@@ -14,7 +14,7 @@ This guide explains how the team works on Connected Care Wi-Fi 7. Read it before
 4. **Open a pull request** against `main`. Fill in the template. The title follows "Commits" below but without a number, for example `feat(cc-dsp): add Hampel outlier filter`. No hook can check the title, so the reviewer does. A PR covers one parent issue and may also close that issue's sub-issues. Put one `Closes #<number>` line per issue under "Linked issue", because closing a parent issue does not close its sub-issues. Unrelated changes go in separate PRs. There is no line limit on a PR.
 5. **Review.** The PR's lead reviewer must approve it: the lead of the linked issue's area, or the Team Lead if you are that lead, or the backup reviewer if you are also the Team Lead. They are requested automatically (see "How review routing works" in `docs/ROLES.md`). Anyone else may review too. If the PR changes anything under `.github/`, a code owner (the Platform & Integration lead or the Team Lead, but not the author) must also approve it, because a workflow there could fake a required check. Every new push needs a fresh approval, every "Request changes" review must be resolved and every conversation resolved before merging. These rules apply to everyone, admins included. Reviewers check the Definition of Done below.
 6. **CI must be green** before merging. The required checks are `rust`, `deny`, `localhost-bind` and `Lead approval`.
-7. **Squash merge.** Keep the PR title as the commit subject. GitHub appends the PR number, so every commit on `main` reads `type(scope): description (#<PR>)`, and the PR links to its issues.
+7. **Merge commit.** Merge with "Create a merge commit", not squash or rebase, so the reviewed branch commits land on `main` as they are, each reading `type(scope): description (#<issue>)`. Before merging, fold any `fixup!` or `squash!` commits into the commits they fix with `git rebase -i --autosquash main`.
 
 Never push directly to `main`.
 
@@ -39,7 +39,7 @@ optional footer
   - `fix(cc-sim): keep frame timestamps monotonic (#20)`
   - `docs(adr): record the replay file format (#31)`
 
-Messages git writes itself (`Merge ...`, `Revert "..."`, `fixup!`, `squash!`) are accepted as they are; the squash merge replaces them.
+Messages git writes itself (`Merge ...`, `Revert "..."`, `fixup!`, `squash!`) are accepted as they are. `fixup!` and `squash!` commits must be folded in before the PR merges (see step 7 above).
 
 **Size.** Keep each commit under 200 changed lines (added plus deleted), so a large PR can be reviewed one commit at a time. `Cargo.lock` and binary files are not counted. This follows Google's [Small CLs](https://google.github.io/eng-practices/review/developer/small-cls.html) guidance. Only for scaffolding or generated files that cannot be split, add a trailer as the last line of the message saying why:
 
@@ -191,7 +191,7 @@ Write an ADR when you change a `cc-core` contract, choose between libraries or m
 
 Versions follow [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html). While the version is `0.x`, each milestone release bumps the minor version (`0.1.0`, `0.2.0`) and a fix between milestones bumps the patch version (`0.2.1`). Tags are `v<version>`, for example `v0.2.0`.
 
-`CHANGELOG.md` follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and is generated from the commits on `main` by [git-cliff](https://git-cliff.org) using `cliff.toml`. `feat` commits go under "Added", `perf` under "Changed" and `fix` under "Fixed"; other types are left out. Do not edit `CHANGELOG.md` by hand: the next release regenerates it, so fix a bad entry by writing better PR titles. Install git-cliff with `brew install git-cliff` or `cargo install git-cliff`.
+`CHANGELOG.md` follows [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) and is generated from the commits on `main` by [git-cliff](https://git-cliff.org) using `cliff.toml`. `feat` commits go under "Added", `perf` under "Changed" and `fix` under "Fixed"; other types are left out. Do not edit `CHANGELOG.md` by hand: the next release regenerates it, so fix a bad entry by writing better commit messages. Install git-cliff with `brew install git-cliff` or `cargo install git-cliff`.
 
 To release:
 
